@@ -17,8 +17,7 @@ public class StreamTokenizer implements Tokenizer {
 	private static final Map<String, TokenType> keywords = new HashMap<>();
 	private static final Map<String, TokenType> symbols = new HashMap<>();
 
-	private boolean hasNext = true; // any stream contains at least the EOF
-									// token
+	private boolean hasNext = true; // any stream contains at least the EOF token
 	private TokenType tokenType;
 	private String tokenString;
 	private boolean boolValue;
@@ -28,10 +27,20 @@ public class StreamTokenizer implements Tokenizer {
 	static {
 		// remark: groups must correspond to the ordinal of the corresponding
 		// token type
-		final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 1
-		final String numRegEx = "(0|[1-9][0-9]*)"; // group 2
+/*********/
+		// recognizes the identity
+		final String identRegEx = "([a-zA-Z][a-zA-Z0-9_]*)"; // group 1		
+		// recognizes the octal literal
+		final String octRegEx = "(?:0(?:0|[1-7][0-7]*))"; //not a group		
+		// recognizes the int literal + octal literal
+		final String numRegEx = "("+octRegEx+"|0|[1-9][0-9]*)"; // group 2	
+		// recognizes all the symbols of us language
+		final String symbolRegEx = "\\|\\||&&|==|\\+|\\*|=|\\(|\\)|;|,|\\{|\\}|<|-|!|\\[|\\]|@|/"; 
+/********/
+		// recognizes the blank spaces
 		final String skipRegEx = "(\\s+|//.*)"; // group 3
-		final String symbolRegEx = "\\|\\||&&|==|\\+|\\*|=|\\(|\\)|;|,|\\{|\\}|<|-|!|\\[|\\]";
+		
+		// this is us regex
 		regEx = identRegEx + "|" + numRegEx + "|" + skipRegEx + "|" + symbolRegEx;
 	}
 
@@ -71,10 +80,12 @@ public class StreamTokenizer implements Tokenizer {
 		scanner = new StreamScanner(regEx, reader);
 	}
 
-	private void checkType() {
+	private void checkType() 
+	{
 		tokenString = scanner.group();
-		if (scanner.group(IDENT.ordinal()) != null) { // IDENT or BOOL or a
-														// keyword
+		// IDENT or BOOL or a keyword
+		if (scanner.group(IDENT.ordinal()) != null)
+		{ 
 			tokenType = keywords.get(tokenString);
 			if (tokenType == null)
 				tokenType = IDENT;
@@ -82,16 +93,26 @@ public class StreamTokenizer implements Tokenizer {
 				boolValue = Boolean.parseBoolean(tokenString);
 			return;
 		}
-		if (scanner.group(NUM.ordinal()) != null) { // NUM
+		//literal numeric (octal or int)
+		if (scanner.group(NUM.ordinal()) != null) 
+		{
 			tokenType = NUM;
-			intValue = Integer.parseInt(tokenString);
+/******/
+			if(tokenString.charAt(0)=='0') // oct
+				intValue = Integer.parseInt(tokenString,8);
+/******/
+			else //num
+				intValue = Integer.parseInt(tokenString);
 			return;
 		}
-		if (scanner.group(SKIP.ordinal()) != null) { // SKIP
+		// blank spaces (SKIP)
+		if (scanner.group(SKIP.ordinal()) != null) 
+		{
 			tokenType = SKIP;
 			return;
 		}
-		tokenType = symbols.get(tokenString); // a symbol
+		// Symbol
+		tokenType = symbols.get(tokenString); 
 		if (tokenType == null)
 			throw new AssertionError("Fatal error");
 	}
