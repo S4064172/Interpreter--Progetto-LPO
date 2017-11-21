@@ -54,6 +54,15 @@ public class StreamTokenizer implements Tokenizer {
 		keywords.put("top", TOP);
 		keywords.put("true", BOOL);
 		keywords.put("var", VAR);
+/*********/
+		keywords.put("if", IF);
+		keywords.put("else", ELSE);
+		keywords.put("pair", PAIR);
+		keywords.put("fst", FST);
+		keywords.put("snd", SND);
+		keywords.put("while", WHILE);
+		keywords.put("length", LENGTH);
+/********/
 	}
 
 	static {
@@ -74,6 +83,10 @@ public class StreamTokenizer implements Tokenizer {
 		symbols.put("!", NOT);
 		symbols.put("[", START_LIST);
 		symbols.put("]", END_LIST);
+/*******/
+		symbols.put("@", CONCAT);
+		symbols.put("/", DIV);
+/*******/
 	}
 
 	public StreamTokenizer(Reader reader) {
