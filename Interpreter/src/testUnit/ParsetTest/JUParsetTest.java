@@ -192,4 +192,86 @@ public class JUParsetTest {
 		} 
 		
 	}
+	
+	@Test
+	public void testAddOrSubRight()
+	{
+		ArrayList<String> relustList = new ArrayList<String>();
+		try(Scanner s = new Scanner(new File("src/testUnit/ParsetTest/testAddOrSubResult.txt")))
+		{
+			while (s.hasNext())
+			{
+				relustList.add(s.next());
+			}
+		s.close();
+		}catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (Throwable e) {
+			fail("Unexpected error. " + e.getMessage());
+		}
+		int i = 0;
+		String result=null;
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testAddOrSubRight.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
+				method.setAccessible(true);
+				t.next();
+				try
+				{
+					result= method.invoke(p).toString();
+					assertTrue(result.equals(relustList.get(i)));
+					i++;
+				}catch (Exception e) {
+					fail(e.getCause().getMessage());
+				} 
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+	
+	@Test
+	public void testAddOrSubWrong()
+	{
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testAddOrSubWrong.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
+				method.setAccessible(true);
+				t.next();
+				try
+				{
+					String res =method.invoke(p).toString();
+					fail("correst -->"+res);
+				}catch (Exception e) 
+				{
+					if(	e.getCause().getClass().equals(ParserException.class) ||
+						e.getCause().getClass().equals(ScannerException.class) ||
+						e.getCause().getClass().equals(IOException.class))
+					{
+						while(!t.tokenString().equals(";") && t.hasNext())
+						{
+							t.next();
+						}
+					}
+					else
+						fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+								+ScannerException.class+"OR"
+								+ IOException.class);
+					
+				} 
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
 }
