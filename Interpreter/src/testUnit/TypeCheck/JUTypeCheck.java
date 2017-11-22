@@ -19,6 +19,7 @@ import _2_StreamParser.StreamParser;
 import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
 import _2_Tokenizer.TokenizerException;
+import _3_Ast.ConCat;
 import _3_Ast.Fst;
 import _3_Ast.Length;
 import _3_Ast.Pair;
@@ -84,8 +85,10 @@ public class JUTypeCheck {
 			fail(e.getMessage());
 		} 
 	}
+	
 	@Test
-	public void TestNewAtomCheckTypeWrong() {
+	public void TestNewAtomCheckTypeWrong() 
+	{
 		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestNewAtomCheckTypeWrong.txt") ))
 		{
 			while (t.hasNext()) 
@@ -112,6 +115,91 @@ public class JUTypeCheck {
 								else
 									fail("error type");
 					fail("riconosciuto");
+				}catch(Exception e )
+				{
+					if(!e.getClass().equals(TypecheckerException.class))
+						if(	e.getCause().getClass().equals(ParserException.class) ||
+							e.getCause().getClass().equals(ScannerException.class) ||
+							e.getCause().getClass().equals(IOException.class))
+						{
+								while(!t.tokenString().equals(";") && t.hasNext())
+								{
+									t.next();
+								}
+						}
+						else
+								fail(e.getCause().getMessage());
+				}
+				
+			}
+		} catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+
+	@Test
+	public void TestConCatCheckTypeRight()
+	{
+		ArrayList<String> relustList = new ArrayList<String>();
+		try(Scanner s = new Scanner(new File("src/testUnit/TypeCheck/TestConCatCheckTypeResult.txt")))
+		{
+			while (s.hasNext())
+			{
+				relustList.add(s.nextLine());
+			}
+		s.close();
+		}catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (Throwable e) {
+			fail("Unexpected error. " + e.getMessage());
+		}
+		int i = 0;
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestConCatCheckTypeRight.txt") ))
+		{
+			String result=null;
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseConCat", null);
+				method.setAccessible(true);
+				t.next();
+				ConCat pp =  (ConCat)method.invoke(p);
+				result=pp.accept(new TypeCheck()).toString();
+				try
+				{
+					assertTrue(result.equals(relustList.get(i)));
+				}catch(Throwable e)
+				{
+					fail("found "+ result + " expeted "+relustList.get(i));
+				}
+				i++;
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+	}
+
+	@Test
+	public void TestConCatCheckTypeWrong() 
+	{
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestConCatCheckTypeWrong.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseConCat", null);
+				method.setAccessible(true);
+				t.next();
+				String result;
+				try
+				{
+					ConCat pp =  (ConCat) method.invoke(p);
+					result=pp.accept(new TypeCheck()).toString();
+					fail("riconosciuto-->"+result);
 				}catch(Exception e )
 				{
 					if(!e.getClass().equals(TypecheckerException.class))
