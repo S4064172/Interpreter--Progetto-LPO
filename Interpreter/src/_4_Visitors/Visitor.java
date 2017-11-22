@@ -57,6 +57,12 @@ public interface Visitor<T> {
 	T visitVarStmt(Ident ident, Exp exp);
 /************/
 	
+	T visitConCat(Exp left, Exp right);
+	
+	T visitDiv(Exp left,Exp right);
+	
+	T vistSub(Exp left, Exp right);
+	
 	T visitLength(Exp exp);
 
 	T visitPair(Exp first, Exp second);

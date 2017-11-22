@@ -22,10 +22,10 @@ import _3_Ast.*;
  * 	Exp ::=  And ('||' And)* 										(V)
  * 	And ::= Eq ('&&' Eq)*											(V)
  * 	Eq ::= Lth ('==' Lth)*											(V)
- * 	Lth ::= ConCat ('<' ConCat)*									(X)
- * 	ConCat ::= PlusOrSub ('@' PlusOrSub)*							(X) 
- * 	PlusOrSub ::= TimesOrDiv ( ('+'|'-') TimesOrDiv)*				(X)
- * 	TimesOrDiv ::= Atom ( ('*'|'/') Atom)*							(X)
+ * 	Lth ::= ConCat ('<' ConCat)*									(V)
+ * 	ConCat ::= PlusOrSub ('@' PlusOrSub)*							(V) 
+ * 	PlusOrSub ::= TimesOrDiv ( ('+'|'-') TimesOrDiv)*				(V)
+ * 	TimesOrDiv ::= Atom ( ('*'|'/') Atom)*							(V)
  * 	Atom ::= '!' Atom 												(V)
  * 			 '-' Atom | 											(V)
  * 			 'top' Atom | 											(V)
@@ -147,74 +147,97 @@ public class StreamParser implements Parser {
 		}
 		return exp;
 	}
-
+	
+/************/
 	private Exp parseLth() throws IOException, ScannerException, ParserException {
-		Exp exp = parseAdd();
+
+		Exp exp = parseConCat();
 		while (tokenizer.tokenType() == LTH) {
 			tokenizer.next();
-			exp = new Lth(exp, parseAdd());
+			exp = new Lth(exp, parseConCat());
 		}
 		return exp;
 	}
+	
 
-	private Exp parseAdd() throws IOException, ScannerException, ParserException {
-		Exp exp = parseTimes();
-		while (tokenizer.tokenType() == PLUS) {
+	private Exp parseConCat() throws IOException, ScannerException, ParserException {
+		Exp exp = parseAddOrSub();
+		while (tokenizer.tokenType() == CONCAT) {
 			tokenizer.next();
-			exp = new Add(exp, parseTimes());
+			exp = new ConCat(exp, parseAddOrSub());
 		}
 		return exp;
 	}
 
-	private Exp parseTimes() throws IOException, ScannerException, ParserException {
+	
+	private Exp parseAddOrSub() throws IOException, ScannerException, ParserException {
+
+		Exp exp = parseTimesOrDiv();
+
+		while (tokenizer.tokenType() == PLUS || tokenizer.tokenType() == MINUS) {
+			TokenType op = tokenizer.tokenType(); 
+			tokenizer.next();
+			exp = (op == PLUS ? new Add(exp, parseTimesOrDiv()) : new Sub(exp, parseTimesOrDiv()));
+
+		}
+		return exp;
+	}
+
+
+	private Exp parseTimesOrDiv() throws IOException, ScannerException, ParserException {
+
 		Exp exp = parseAtom();
-		while (tokenizer.tokenType() == TIMES) {
+
+		while (tokenizer.tokenType() == TIMES || tokenizer.tokenType() == DIV) {
+			TokenType op = tokenizer.tokenType(); 
 			tokenizer.next();
-			exp = new Mul(exp, parseAtom());
+			exp = ( op == TIMES ? new Mul(exp, parseAtom() ) : (new Div(exp, parseAtom()) ) );
+
 		}
 		return exp;
 	}
-
+/************/
+		
 	private Exp parseAtom() throws IOException, ScannerException, ParserException {
 		switch (tokenizer.tokenType()) {
-		default:
-			unexpectedTokenError();
-		case NUM:
-			return parseNum();
-		case BOOL:
-			return parseBool();
-		case IDENT:
-			return parseIdent();
-		case NOT:
-			return parseNot();
-		case MINUS:
-			return parseMinus();
-		case POP:
-			return parsePop();
-		case TOP:
-			return parseTop();
-		case PUSH:
-			return parsePushStmt();
-		case START_LIST:
-			return parseList();
-		case OPEN_PAR:
-			tokenizer.next();
-			Exp exp = parseExp();
-			consume(CLOSED_PAR);
-			return exp;
+			default:
+				unexpectedTokenError();
+			case NUM:
+				return parseNum();
+			case BOOL:
+				return parseBool();
+			case IDENT:
+				return parseIdent();
+			case NOT:
+				return parseNot();
+			case MINUS:
+				return parseMinus();
+			case POP:
+				return parsePop();
+			case TOP:
+				return parseTop();
+			case PUSH:
+				return parsePushStmt();
+			case START_LIST:
+				return parseList();
+			case OPEN_PAR:
+				tokenizer.next();
+				Exp exp = parseExp();
+				consume(CLOSED_PAR);
+				return exp;
 /******/
-		case LENGTH:
-			return parseLength();
-		case PAIR:
-			return parsePair();
-		case FST:
-			return parseFst();
-		case SND:
-			return parseSnd();
+			case LENGTH:
+				return parseLength();
+			case PAIR:
+				return parsePair();
+			case FST:
+				return parseFst();
+			case SND:
+				return parseSnd();
 /*****/
 		}
 	}
-
+	
 /*******/
 	private Length parseLength()  throws IOException, ScannerException, ParserException {
 		consume(LENGTH);
