@@ -18,6 +18,7 @@ import _2_StreamParser.ParserException;
 import _2_StreamParser.StreamParser;
 import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
+import _3_Ast.ConCat;
 import _3_Ast.Fst;
 import _3_Ast.IntLiteral;
 import _3_Ast.Length;
@@ -82,6 +83,54 @@ public class JUEvalTest {
 							}
 							else
 								fail("error type");
+				try
+				{
+					assertTrue(result.equals(relustList.get(i)));
+				}catch(Throwable e)
+				{
+					fail("found "+ result + " expeted "+relustList.get(i));
+				}
+				i++;
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+	}
+
+	@Test
+	public void TestConCatCheckTypeRight() 
+	{
+		
+		ArrayList<String> relustList = new ArrayList<String>();
+		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestConCatEvalResult.txt")))
+		{
+			while (s.hasNext())
+			{
+				relustList.add(s.nextLine());
+			}
+		s.close();
+		}catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (Throwable e) {
+			fail("Unexpected error. " + e.getMessage());
+		}
+		int i = 0;
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestConCatEvalRight.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseConCat", null);
+				method.setAccessible(true);
+				t.next();
+				ConCat pp = (ConCat) method.invoke(p);
+				String result = null;
+			
+				pp.accept(new TypeCheck());
+				result =pp.accept(new Eval()).toString();
+				
 				try
 				{
 					assertTrue(result.equals(relustList.get(i)));
