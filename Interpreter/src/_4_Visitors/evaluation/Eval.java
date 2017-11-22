@@ -147,5 +147,30 @@ public class Eval implements Visitor<Value> {
 		env.newFresh(ident, exp.accept(this));
 		return null;
 	}
+/************/
+	@Override
+	public Value visitLength(Exp exp) {
+		int count=0;
+		for (@SuppressWarnings("unused")Value value : exp.accept(this).asList())
+			count++;
+		return new IntValue(count);
+	}
+	
+	@Override
+	public Value visitPair(Exp first, Exp second) {
+		return new PairValueImpl(first.accept(this),second.accept(this));
+	}
 
+	@Override
+	public Value visitFst(Exp exp) {
+		return exp.accept(this).asPair().first();
+	}
+
+	@Override
+	public Value visitSnd(Exp exp) {
+		return exp.accept(this).asPair().second();
+	}
+	
+	
+/************/
 }

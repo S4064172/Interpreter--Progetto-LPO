@@ -55,4 +55,15 @@ public interface Visitor<T> {
 	T visitTop(Exp exp);
 
 	T visitVarStmt(Ident ident, Exp exp);
+/************/
+	
+	T visitLength(Exp exp);
+
+	T visitPair(Exp first, Exp second);
+
+	T visitFst(Exp exp);
+
+	T visitSnd(Exp exp);
+
+/************/
 }

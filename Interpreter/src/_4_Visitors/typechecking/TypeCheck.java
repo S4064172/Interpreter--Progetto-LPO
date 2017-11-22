@@ -163,5 +163,29 @@ public class TypeCheck implements Visitor<Type> {
 		env.newFresh(ident, exp.accept(this));
 		return null;
 	}
+	
+/************/	
+	@Override
+	public Type visitLength(Exp exp) {
+		exp.accept(this).checkList();
+		return INT;
+	}
+
+	@Override
+	public Type visitPair(Exp first, Exp second) {
+		return new PairType(first.accept(this), second.accept(this));
+	}
+
+	@Override
+	public Type visitFst(Exp exp) {
+		return ((PairType) exp.accept(this).checkPair()).getElTypeFirst();
+	}
+
+	@Override
+	public Type visitSnd(Exp exp) {
+		return ((PairType) exp.accept(this).checkPair()).getElTypeSecond();
+	}
+	
+/************/
 
 }

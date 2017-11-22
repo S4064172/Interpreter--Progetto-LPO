@@ -12,5 +12,14 @@ public interface Type {
 			throw new TypecheckerException(toString(), ListType.LIST);
 		return ((ListType) this).getElType();
 	}
+	
+	
+/***********/	
+	default Type checkPair() throws TypecheckerException {
+		if (!(this instanceof PairType))
+			throw new TypecheckerException(toString(), PairType.PAIR);
+		return ((PairType) this);
+	}
+/***********/
 
 }

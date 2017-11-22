@@ -10,18 +10,38 @@ import _2_Tokenizer.Tokenizer;
 import _3_Ast.*;
 
 /*
- Prog ::= StmtSeq 'EOF'
- StmtSeq ::= Stmt (';' StmtSeq)?
- Stmt ::= 'var'? ID '=' Exp | 'print' Exp |  'for' ID 'in' Exp '{' StmtSeq '}'
- ExpSeq ::= Exp (',' ExpSeq)?
- Exp ::= And ('||' And)*
- And ::= Eq ('&&' Eq)*
- Eq ::= Lth ('==' Lth)*
- Lth ::= Plus ('<' Plus)*
- Plus ::= Times ('+' Times)*
- Times ::= Atom ('*' Atom)*
- Atom ::= '!' Atom | '-' Atom | 'top' Atom | 'pop' Atom | 'push' '('Exp,Exp')' | '[' ExpSeq ']' | NUM | BOOL | ID | '(' Exp ')'
-*/
+ * Grammatica Progetto :
+ *	Prog ::= StmtSeq 'EOF'											(V)
+ *	StmtSeq ::= Stmt (';' StmtSeq)?									(V)
+ * 	Stmt ::= 'var'? ID '=' Exp | 									(V)
+ * 			 'print' Exp |  										(V)
+ * 			 'for' ID 'in' Exp '{' StmtSeq '}' |					(V)
+ * 			 'if' '('Exp')' '{' StmtSeq '}' ('else' '{'StmtSeq'}')?	(X) 
+ * 			 'while' '('Exp')' '{'StmtSeq'}'						(X)
+ * 	ExpSeq ::= Exp (',' ExpSeq)?									(V)			
+ * 	Exp ::=  And ('||' And)* 										(V)
+ * 	And ::= Eq ('&&' Eq)*											(V)
+ * 	Eq ::= Lth ('==' Lth)*											(V)
+ * 	Lth ::= ConCat ('<' ConCat)*									(X)
+ * 	ConCat ::= PlusOrSub ('@' PlusOrSub)*							(X) 
+ * 	PlusOrSub ::= TimesOrDiv ( ('+'|'-') TimesOrDiv)*				(X)
+ * 	TimesOrDiv ::= Atom ( ('*'|'/') Atom)*							(X)
+ * 	Atom ::= '!' Atom 												(V)
+ * 			 '-' Atom | 											(V)
+ * 			 'top' Atom | 											(V)
+ * 			 'pop' Atom | 											(V)
+ * 			 'push' '('Exp,Exp')' | 								(V)
+ * 			 '[' ExpSeq ']' | 										(V)
+ * 			 NUM | 													(V)
+ * 			 BOOL | 												(V)
+ * 			 ID | 													(V)
+ * 			 '(' Exp ')' |											(V)
+ * 			 'length' Atom 											(X)
+ * 			 'pair' '('Exp','Exp')'|								(X)
+ * 			 'fst' Atom |											(X)
+ * 			 'snd' Atom												(X)
+ * 
+ */
 
 public class StreamParser implements Parser {
 
@@ -182,9 +202,50 @@ public class StreamParser implements Parser {
 			Exp exp = parseExp();
 			consume(CLOSED_PAR);
 			return exp;
+/******/
+		case LENGTH:
+			return parseLength();
+		case PAIR:
+			return parsePair();
+		case FST:
+			return parseFst();
+		case SND:
+			return parseSnd();
+/*****/
 		}
 	}
 
+/*******/
+	private Length parseLength()  throws IOException, ScannerException, ParserException {
+		consume(LENGTH);
+		Exp exp = parseAtom();
+		return new Length(exp);
+	}
+	
+	private Pair parsePair()  throws IOException, ScannerException, ParserException {
+		consume(PAIR);
+		consume(OPEN_PAR);
+		Exp firs = parseExp();
+		consume(EXP_SEP);
+		Exp second = parseExp();
+		consume(CLOSED_PAR);
+		return new Pair(firs, second);
+	}
+	
+	
+	private Fst parseFst() throws IOException, ScannerException, ParserException	{
+		consume(FST);
+		Exp exp = parseAtom();
+		return new Fst(exp);	
+	}
+	
+	private Snd parseSnd() throws IOException, ScannerException, ParserException	{
+		consume(SND);
+		Exp exp = parseAtom();
+		return new Snd(exp);	
+	}
+/******/
+	
 	private IntLiteral parseNum() throws IOException, ScannerException, ParserException {
 		int val = tokenizer.intValue();
 		consume(NUM);

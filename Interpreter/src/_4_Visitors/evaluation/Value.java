@@ -17,5 +17,12 @@ public interface Value {
 	default ListValue asList() {
 		throw new ClassCastException("Expecting a list value");
 	}
+	
+/***********/
+	default PairValue asPair() {
+		throw new ClassCastException("Expecting a pair value");
+	}
+/**********/
+	
 
 }
