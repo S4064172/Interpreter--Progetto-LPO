@@ -20,9 +20,11 @@ import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
 import _3_Ast.Add;
 import _3_Ast.ConCat;
+import _3_Ast.Div;
 import _3_Ast.Fst;
 import _3_Ast.IntLiteral;
 import _3_Ast.Length;
+import _3_Ast.Mul;
 import _3_Ast.Pair;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
@@ -33,7 +35,7 @@ import _4_Visitors.typechecking.TypecheckerException;
 public class JUEvalTest {
 
 	@Test
-	public void TestNewAtomCheckTypeRight() {
+	public void TestNewAtomEvalRight() {
 		
 		ArrayList<String> relustList = new ArrayList<String>();
 		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestNewAtomEvalResult.txt")))
@@ -101,7 +103,7 @@ public class JUEvalTest {
 	}
 
 	@Test
-	public void TestConCatCheckTypeRight() 
+	public void TestConCatEvalRight() 
 	{
 		
 		ArrayList<String> relustList = new ArrayList<String>();
@@ -149,7 +151,7 @@ public class JUEvalTest {
 	}
 
 	@Test
-	public void TestAddOrSubCheckTypeRight() 
+	public void TestAddOrSubEvalRight() 
 	{
 		
 		ArrayList<String> relustList = new ArrayList<String>();
@@ -186,6 +188,61 @@ public class JUEvalTest {
 				{
 					((Add)pp).accept(new TypeCheck()).toString();
 					result =((Add)pp).accept(new Eval()).toString();
+				}
+				
+				try
+				{
+					assertTrue(result.equals(relustList.get(i)));
+				}catch(Throwable e)
+				{
+					fail("found "+ result + " expeted "+relustList.get(i));
+				}
+				i++;
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+	}
+	
+	@Test
+	public void TestTimesOrDivEvalRight() 
+	{
+		
+		ArrayList<String> relustList = new ArrayList<String>();
+		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestTimesOrDivEvalResult.txt")))
+		{
+			while (s.hasNext())
+			{
+				relustList.add(s.nextLine());
+			}
+		s.close();
+		}catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (Throwable e) {
+			fail("Unexpected error. " + e.getMessage());
+		}
+		int i = 0;
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestTimesOrDivEvalRight.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+				method.setAccessible(true);
+				t.next();
+				String result = null;
+				Object pp =  method.invoke(p);
+				if(pp instanceof Div)
+				{
+					((Div)pp).accept(new TypeCheck()).toString();
+					result =((Div)pp).accept(new Eval()).toString();
+				}
+				else
+				{
+					((Mul)pp).accept(new TypeCheck()).toString();
+					result =((Mul)pp).accept(new Eval()).toString();
 				}
 				
 				try
