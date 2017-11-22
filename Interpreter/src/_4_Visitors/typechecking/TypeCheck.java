@@ -166,6 +166,30 @@ public class TypeCheck implements Visitor<Type> {
 	
 /************/
 	@Override
+	public Type visitWhileStmt(Exp exp, StmtSeq block) {
+		exp.accept(this).checkEqual(BOOL);
+		env.enterScope();
+		block.accept(this);
+		env.exitScope();
+		return null;
+	}
+	
+	@Override
+	public Type visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
+		exp.accept(this).checkEqual(BOOL);
+		env.enterScope();
+		ifBlock.accept(this);
+		env.exitScope();
+		if(elseBlock != null)
+		{	
+			env.enterScope();
+			elseBlock.accept(this);
+			env.exitScope();
+		}
+		return null;
+	}
+	
+	@Override
 	public Type visitConCat(Exp left, Exp right) {
 		Type type = left.accept(this);
 		type.checkList();

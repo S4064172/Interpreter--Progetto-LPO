@@ -16,8 +16,8 @@ import _3_Ast.*;
  * 	Stmt ::= 'var'? ID '=' Exp | 									(V)
  * 			 'print' Exp |  										(V)
  * 			 'for' ID 'in' Exp '{' StmtSeq '}' |					(V)
- * 			 'if' '('Exp')' '{' StmtSeq '}' ('else' '{'StmtSeq'}')?	(X) 
- * 			 'while' '('Exp')' '{'StmtSeq'}'						(X)
+ * 			 'if' '('Exp')' '{' StmtSeq '}' ('else' '{'StmtSeq'}')?	(V) 
+ * 			 'while' '('Exp')' '{'StmtSeq'}'						(V)
  * 	ExpSeq ::= Exp (',' ExpSeq)?									(V)			
  * 	Exp ::=  And ('||' And)* 										(V)
  * 	And ::= Eq ('&&' Eq)*											(V)
@@ -36,13 +36,12 @@ import _3_Ast.*;
  * 			 BOOL | 												(V)
  * 			 ID | 													(V)
  * 			 '(' Exp ')' |											(V)
- * 			 'length' Atom 											(X)
- * 			 'pair' '('Exp','Exp')'|								(X)
- * 			 'fst' Atom |											(X)
- * 			 'snd' Atom												(X)
+ * 			 'length' Atom 											(V)
+ * 			 'pair' '('Exp','Exp')'|								(V)
+ * 			 'fst' Atom |											(V)
+ * 			 'snd' Atom												(V)
  * 
  */
-
 public class StreamParser implements Parser {
 
 	private final Tokenizer tokenizer;
@@ -89,6 +88,12 @@ public class StreamParser implements Parser {
 			return parseAssignStmt();
 		case FOR:
 			return parseForEachStmt();
+/*******/
+		case WHILE:
+			return parseWhileStmt();
+		case IF:
+			return parseIfStmt();
+/******/
 		}
 	}
 
@@ -120,7 +125,33 @@ public class StreamParser implements Parser {
 		consume(END_BLOCK);
 		return new ForEachStmt(ident, exp, stmts);
 	}
-
+/**********/
+	private WhileStmt parseWhileStmt() throws IOException, ScannerException, ParserException {
+		consume(WHILE);
+		Exp exp = parseExp();
+		consume(START_BLOCK);
+		StmtSeq stmts = parseStmtSeq();
+		consume(END_BLOCK);
+		return new WhileStmt(exp, stmts);
+	}
+	
+	private IfStmt parseIfStmt() throws IOException, ScannerException, ParserException {
+		consume(IF);
+		Exp exp = parseExp();
+		consume(START_BLOCK);
+		StmtSeq ifStmts = parseStmtSeq();
+		consume(END_BLOCK);
+		StmtSeq esleStmts = null;
+		if (tokenizer.tokenType() == ELSE)
+		{
+			tokenizer.next();
+			consume(START_BLOCK);
+			esleStmts = parseStmtSeq();
+			consume(END_BLOCK);
+		}
+		return new IfStmt(exp, ifStmts,esleStmts);
+	}
+/**********/
 	private Exp parseExp() throws IOException, ScannerException, ParserException {
 		Exp exp = parseAnd();
 		while (tokenizer.tokenType() == OR) {
