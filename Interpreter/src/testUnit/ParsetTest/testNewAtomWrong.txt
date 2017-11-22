@@ -1,0 +1,8 @@
+length [5,5,5,];
+length [];
+snd [5,];
+fst [5,5;
+pair(5],[5]);
+pair[5],[5]);
+pair([5],[5);
+pair([5],[5]
