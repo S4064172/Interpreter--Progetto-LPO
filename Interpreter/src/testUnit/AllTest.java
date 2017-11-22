@@ -4,10 +4,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import testUnit.EvalTest.JUEvalTest;
+import testUnit.ParsetTest.JUParsetTest;
 import testUnit.TokenizerTest.JUTokenizerTest;
-
-
-
+import testUnit.TypeCheck.JUTypeCheck;
 
 public class AllTest {
 
@@ -19,6 +19,28 @@ public class AllTest {
 		test.JUTokenizerTest_NUM();
 	}
 	
+	@Test
+	public void ParserTest() 
+	{
+		JUParsetTest test = new JUParsetTest();
+		test.testNewAtomRight();
+		test.testNewAtomWrong();
+	}
 	
+	@Test
+	public void TypeCheckTest() 
+	{
+		JUTypeCheck test = new JUTypeCheck();
+		test.TestNewAtomCheckTypeRight();
+		test.TestNewAtomCheckTypeWrong();
+	}
+	
+	@Test
+	public void Eval() 
+	{
+		JUEvalTest test = new JUEvalTest();
+		test.TestNewAtomCheckTypeRight();
+		
+	}
 
 }
