@@ -24,8 +24,10 @@ import _2_Tokenizer.Tokenizer;
 import _2_Tokenizer.TokenizerException;
 import _3_Ast.Add;
 import _3_Ast.ConCat;
+import _3_Ast.Div;
 import _3_Ast.Fst;
 import _3_Ast.Length;
+import _3_Ast.Mul;
 import _3_Ast.Pair;
 import _3_Ast.Prog;
 import _3_Ast.Snd;
@@ -282,6 +284,83 @@ public class JUTypeCheck {
 						result=((Sub)pp).accept(new TypeCheck()).toString();
 					else
 						result=((Add)pp).accept(new TypeCheck()).toString();
+					fail("riconosciuto-->"+result);
+				}catch(Exception e )
+				{
+					if(!e.getClass().equals(TypecheckerException.class))
+						if(	e.getCause().getClass().equals(ParserException.class) ||
+							e.getCause().getClass().equals(ScannerException.class) ||
+							e.getCause().getClass().equals(IOException.class))
+						{
+								while(!t.tokenString().equals(";") && t.hasNext())
+								{
+									t.next();
+								}
+						}
+						else
+								fail(e.getCause().getMessage());
+				}
+				
+			}
+		} catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+	@Test
+	public void TestTimesOrDivCheckTypeRight()
+	{
+		
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestTimesOrDivCheckTypeRight.txt") ))
+		{
+			String result=null;
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+				method.setAccessible(true);
+				t.next();
+				Object pp =  method.invoke(p);
+				if(pp instanceof Div)
+					result=((Div)pp).accept(new TypeCheck()).toString();
+				else
+					result=((Mul)pp).accept(new TypeCheck()).toString();
+				try
+				{
+					assertTrue(result.equals("INT"));
+				}catch(Throwable e)
+				{
+					fail("found "+ result + " expeted "+"INT");
+				}
+				
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+	}
+
+	@Test
+	public void TestTimesOrDivCheckTypeWrong() 
+	{
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestTimesOrDivCheckTypeWrong.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+				method.setAccessible(true);
+				t.next();
+				String result;
+				try
+				{
+					Object pp =  method.invoke(p);
+					if(pp instanceof Div)
+						result=((Div)pp).accept(new TypeCheck()).toString();
+					else
+						result=((Mul)pp).accept(new TypeCheck()).toString();
 					fail("riconosciuto-->"+result);
 				}catch(Exception e )
 				{
