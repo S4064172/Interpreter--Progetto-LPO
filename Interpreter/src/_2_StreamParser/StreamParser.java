@@ -202,9 +202,50 @@ public class StreamParser implements Parser {
 			Exp exp = parseExp();
 			consume(CLOSED_PAR);
 			return exp;
+/******/
+		case LENGTH:
+			return parseLength();
+		case PAIR:
+			return parsePair();
+		case FST:
+			return parseFst();
+		case SND:
+			return parseSnd();
+/*****/
 		}
 	}
 
+/*******/
+	private Length parseLength()  throws IOException, ScannerException, ParserException {
+		consume(LENGTH);
+		Exp exp = parseAtom();
+		return new Length(exp);
+	}
+	
+	private Pair parsePair()  throws IOException, ScannerException, ParserException {
+		consume(PAIR);
+		consume(OPEN_PAR);
+		Exp firs = parseExp();
+		consume(EXP_SEP);
+		Exp second = parseExp();
+		consume(CLOSED_PAR);
+		return new Pair(firs, second);
+	}
+	
+	
+	private Fst parseFst() throws IOException, ScannerException, ParserException	{
+		consume(FST);
+		Exp exp = parseAtom();
+		return new Fst(exp);	
+	}
+	
+	private Snd parseSnd() throws IOException, ScannerException, ParserException	{
+		consume(SND);
+		Exp exp = parseAtom();
+		return new Snd(exp);	
+	}
+/******/
+	
 	private IntLiteral parseNum() throws IOException, ScannerException, ParserException {
 		int val = tokenizer.intValue();
 		consume(NUM);
