@@ -164,7 +164,26 @@ public class TypeCheck implements Visitor<Type> {
 		return null;
 	}
 	
-/************/	
+/************/
+	@Override
+	public Type visitConCat(Exp left, Exp right) {
+		Type type = left.accept(this);
+		type.checkList();
+		return right.accept(this).checkEqual(type);
+	}
+	
+	public Type visitDiv(Exp left,Exp right){
+		checkBinOp(left, right, INT);
+		return INT;
+	}
+
+	
+	@Override
+	public Type vistSub(Exp left, Exp right) {
+		checkBinOp(left, right, INT);
+		return INT;
+	}
+	
 	@Override
 	public Type visitLength(Exp exp) {
 		exp.accept(this).checkList();

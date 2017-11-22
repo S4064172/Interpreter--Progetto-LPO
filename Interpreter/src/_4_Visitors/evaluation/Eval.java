@@ -148,6 +148,30 @@ public class Eval implements Visitor<Value> {
 		return null;
 	}
 /************/
+	
+	@Override
+	public Value visitConCat(Exp left, Exp right) {
+		ListValue result = new LinkedListValue(left.accept(this).asList());
+		for (Value value : right.accept(this).asList())
+			result = result.push(value);
+		return result;
+	}
+
+	@Override
+	public Value visitDiv(Exp left, Exp right) {
+		int temp = right.accept(this).asInt();
+		if (temp==0)
+			throw new EvaluatorException("cannot divide by 0");
+		return  new IntValue(left.accept(this).asInt()/temp);
+	}
+
+
+	@Override
+	public Value vistSub(Exp left, Exp right) {
+		
+		return new IntValue(left.accept(this).asInt()-right.accept(this).asInt());
+	}
+	
 	@Override
 	public Value visitLength(Exp exp) {
 		int count=0;

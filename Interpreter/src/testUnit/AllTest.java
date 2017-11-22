@@ -25,6 +25,12 @@ public class AllTest {
 		JUParsetTest test = new JUParsetTest();
 		test.testNewAtomRight();
 		test.testNewAtomWrong();
+		test.testAddOrSubRight();
+		test.testAddOrSubWrong();
+		test.testConCatRight();
+		test.testConCatWrong();
+		test.testTimesOrDivRight();
+		test.testTimesOrDivWrong();
 	}
 	
 	@Test
@@ -33,13 +39,23 @@ public class AllTest {
 		JUTypeCheck test = new JUTypeCheck();
 		test.TestNewAtomCheckTypeRight();
 		test.TestNewAtomCheckTypeWrong();
+		test.TestAddOrSubCheckTypeRight();
+		test.TestAddOrSubCheckTypeWrong();
+		test.TestConCatCheckTypeRight();
+		test.TestConCatCheckTypeWrong();
+		test.TestTimesOrDivCheckTypeRight();
+		test.TestTimesOrDivCheckTypeWrong();
 	}
 	
 	@Test
 	public void Eval() 
 	{
 		JUEvalTest test = new JUEvalTest();
-		test.TestNewAtomCheckTypeRight();
+		test.TestNewAtomEvalRight();
+		test.TestAddOrSubEvalRight();
+		test.TestConCatEvalRight();
+		test.TestTimesOrDivEvalRight();
+		
 		
 	}
 

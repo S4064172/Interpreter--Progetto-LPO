@@ -1,0 +1,5 @@
+Add(IntLiteral(5),IntLiteral(4))
+Sub(IntLiteral(5),IntLiteral(4))
+Add(Sign(IntLiteral(5)),Sign(IntLiteral(5)))
+Sub(IntLiteral(5),Sign(Sign(IntLiteral(5))))
+Sub(Sign(IntLiteral(5)),IntLiteral(5))
