@@ -1,0 +1,4 @@
+ConCat(ListLiteral(SingleExp(IntLiteral(1))),ListLiteral(SingleExp(IntLiteral(1))))
+ConCat(ListLiteral(SingleExp(Pair(IntLiteral(1),IntLiteral(2)))),ListLiteral(SingleExp(IntLiteral(1))))
+ConCat(ListLiteral(SingleExp(BoolLiteral(true))),ListLiteral(SingleExp(IntLiteral(1))))
+ConCat(ListLiteral(SingleExp(Pair(IntLiteral(1),IntLiteral(2)))),ListLiteral(SingleExp(BoolLiteral(true))))
