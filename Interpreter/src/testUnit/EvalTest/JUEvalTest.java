@@ -26,8 +26,10 @@ import _3_Ast.IntLiteral;
 import _3_Ast.Length;
 import _3_Ast.Mul;
 import _3_Ast.Pair;
+import _3_Ast.ProgClass;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
+import _3_Ast.WhileStmt;
 import _4_Visitors.evaluation.Eval;
 import _4_Visitors.typechecking.TypeCheck;
 import _4_Visitors.typechecking.TypecheckerException;
@@ -56,43 +58,47 @@ public class JUEvalTest {
 		{
 			while (t.hasNext()) 
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
-				method.setAccessible(true);
-				t.next();
-				Object pp =  method.invoke(p);
 				String result = null;
-				if (pp instanceof Pair)
-				{
-					((Pair) pp).accept(new TypeCheck());
-					result =((Pair) pp).accept(new Eval()).toString();
-				}
-				else
-					if (pp instanceof Length)
-					{
-						((Length) pp).accept(new TypeCheck());
-						result =((Length) pp).accept(new Eval()).toString();
-					}
-					else
-						if (pp instanceof Fst)
-						{
-							((Fst) pp).accept(new TypeCheck());
-							result = ((Fst) pp).accept(new Eval()).toString();
-						}
-						else
-							if (pp instanceof Snd)
-							{
-								((Snd) pp).accept(new TypeCheck());
-								result = ((Snd) pp).accept(new Eval()).toString();
-							}
-							else
-								fail("error type");
 				try
 				{
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+					method.setAccessible(true);
+					t.next();
+					Object pp =  method.invoke(p);
+					if (pp instanceof Pair)
+					{
+						((Pair) pp).accept(new TypeCheck());
+						result =((Pair) pp).accept(new Eval()).toString();
+					}
+					else
+						if (pp instanceof Length)
+						{
+							((Length) pp).accept(new TypeCheck());
+							result =((Length) pp).accept(new Eval()).toString();
+						}
+						else
+							if (pp instanceof Fst)
+							{
+								((Fst) pp).accept(new TypeCheck());
+								result = ((Fst) pp).accept(new Eval()).toString();
+							}
+							else
+								if (pp instanceof Snd)
+								{
+									((Snd) pp).accept(new TypeCheck());
+									result = ((Snd) pp).accept(new Eval()).toString();
+								}
+								else
+									fail("error type");
+					
 					assertTrue(result.equals(relustList.get(i)));
 				}catch(Throwable e)
 				{
-					fail("found "+ result + " expeted "+relustList.get(i));
+					if(result!=null)
+						fail("found "+ result + " expeted "+relustList.get(i));
+					else
+						fail(e.getCause().getMessage());
 				}
 				i++;
 			}
@@ -125,22 +131,23 @@ public class JUEvalTest {
 		{
 			while (t.hasNext()) 
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseConCat", null);
-				method.setAccessible(true);
-				t.next();
-				ConCat pp = (ConCat) method.invoke(p);
 				String result = null;
-			
-				pp.accept(new TypeCheck());
-				result =pp.accept(new Eval()).toString();
-				
 				try
 				{
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseConCat", null);
+					method.setAccessible(true);
+					t.next();
+					ConCat pp = (ConCat) method.invoke(p);
+					pp.accept(new TypeCheck());
+					result =pp.accept(new Eval()).toString();
 					assertTrue(result.equals(relustList.get(i)));
 				}catch(Throwable e)
 				{
-					fail("found "+ result + " expeted "+relustList.get(i));
+					if(result!=null)
+						fail("found "+ result + " expeted "+relustList.get(i));
+					else
+						fail(e.getCause().getMessage());
 				}
 				i++;
 			}
@@ -173,29 +180,33 @@ public class JUEvalTest {
 		{
 			while (t.hasNext()) 
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
-				method.setAccessible(true);
-				t.next();
 				String result = null;
-				Object pp =  method.invoke(p);
-				if(pp instanceof Sub)
-				{
-					((Sub)pp).accept(new TypeCheck()).toString();
-					result =((Sub)pp).accept(new Eval()).toString();
-				}
-				else
-				{
-					((Add)pp).accept(new TypeCheck()).toString();
-					result =((Add)pp).accept(new Eval()).toString();
-				}
-				
 				try
 				{
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
+					method.setAccessible(true);
+					t.next();
+					Object pp =  method.invoke(p);
+					if(pp instanceof Sub)
+					{
+						((Sub)pp).accept(new TypeCheck()).toString();
+						result =((Sub)pp).accept(new Eval()).toString();
+					}
+					else
+					{
+						((Add)pp).accept(new TypeCheck()).toString();
+						result =((Add)pp).accept(new Eval()).toString();
+					}
+				
+				
 					assertTrue(result.equals(relustList.get(i)));
 				}catch(Throwable e)
 				{
-					fail("found "+ result + " expeted "+relustList.get(i));
+					if(result!=null)
+						fail("found "+ result + " expeted "+relustList.get(i));
+					else
+						fail(e.getCause().getMessage());
 				}
 				i++;
 			}
@@ -228,29 +239,33 @@ public class JUEvalTest {
 		{
 			while (t.hasNext()) 
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
-				method.setAccessible(true);
-				t.next();
 				String result = null;
-				Object pp =  method.invoke(p);
-				if(pp instanceof Div)
-				{
-					((Div)pp).accept(new TypeCheck()).toString();
-					result =((Div)pp).accept(new Eval()).toString();
-				}
-				else
-				{
-					((Mul)pp).accept(new TypeCheck()).toString();
-					result =((Mul)pp).accept(new Eval()).toString();
-				}
-				
 				try
 				{
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+					method.setAccessible(true);
+					t.next();
+					Object pp =  method.invoke(p);
+					if(pp instanceof Div)
+					{
+						((Div)pp).accept(new TypeCheck()).toString();
+						result =((Div)pp).accept(new Eval()).toString();
+					}
+					else
+					{
+						((Mul)pp).accept(new TypeCheck()).toString();
+						result =((Mul)pp).accept(new Eval()).toString();
+					}
+				
+				
 					assertTrue(result.equals(relustList.get(i)));
 				}catch(Throwable e)
 				{
-					fail("found "+ result + " expeted "+relustList.get(i));
+					if(result!=null)
+						fail("found "+ result + " expeted "+relustList.get(i));
+					else
+						fail(e.getCause().getMessage());
 				}
 				i++;
 			}
