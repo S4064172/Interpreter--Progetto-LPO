@@ -490,7 +490,7 @@ public class JUTypeCheck {
 	}
 	
 	@Test
-	public void TestIfTypeRight()
+	public void TestIfCheckTypeRight()
 	{
 		
 		
