@@ -96,6 +96,7 @@ public class JUTypeCheck {
 							fail(e.getCause().getMessage());
 				}
 				i++;
+				result=null;
 			}
 		}
 		catch (Exception e) {
@@ -199,6 +200,7 @@ public class JUTypeCheck {
 							fail(e.getCause().getMessage());
 				}
 				i++;
+				result=null;
 			}
 		}
 		catch (Exception e) {
@@ -280,7 +282,7 @@ public class JUTypeCheck {
 						else
 							fail(e.getCause().getMessage());
 				}
-				
+				result=null;
 			}
 		}
 		catch (Exception e) {
@@ -365,7 +367,7 @@ public class JUTypeCheck {
 						else
 							fail(e.getCause().getMessage());
 				}
-				
+				result=null;
 			}
 		}
 		catch (Exception e) {
