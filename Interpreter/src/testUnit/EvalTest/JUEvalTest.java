@@ -102,7 +102,10 @@ public class JUEvalTest {
 					if(result!=null)
 						fail("found "+ result + " expeted "+relustList.get(i));
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				i++;
 				result=null;
@@ -152,7 +155,10 @@ public class JUEvalTest {
 					if(result!=null)
 						fail("found "+ result + " expeted "+relustList.get(i));
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				i++;
 				result=null;
@@ -212,7 +218,10 @@ public class JUEvalTest {
 					if(result!=null)
 						fail("found "+ result + " expeted "+relustList.get(i));
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				i++;
 				result=null;
@@ -272,7 +281,10 @@ public class JUEvalTest {
 					if(result!=null)
 						fail("found "+ result + " expeted "+relustList.get(i));
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				i++;
 				result=null;
@@ -304,7 +316,10 @@ public class JUEvalTest {
 					
 				}catch(Throwable e)
 				{
-					fail(e.getCause().getMessage());
+					if(e.getClass().equals(TypecheckerException.class))
+						fail(e.getMessage());
+					else
+						fail(e.getCause().getMessage());
 				}
 			}
 		}
