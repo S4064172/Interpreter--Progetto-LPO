@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,10 +24,12 @@ import _3_Ast.Add;
 import _3_Ast.ConCat;
 import _3_Ast.Div;
 import _3_Ast.Fst;
+import _3_Ast.IfStmt;
 import _3_Ast.IntLiteral;
 import _3_Ast.Length;
 import _3_Ast.Mul;
 import _3_Ast.Pair;
+import _3_Ast.Prog;
 import _3_Ast.ProgClass;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
@@ -101,6 +105,7 @@ public class JUEvalTest {
 						fail(e.getCause().getMessage());
 				}
 				i++;
+				result=null;
 			}
 		}
 		catch (Exception e) {
@@ -150,6 +155,7 @@ public class JUEvalTest {
 						fail(e.getCause().getMessage());
 				}
 				i++;
+				result=null;
 			}
 		}
 		catch (Exception e) {
@@ -209,6 +215,7 @@ public class JUEvalTest {
 						fail(e.getCause().getMessage());
 				}
 				i++;
+				result=null;
 			}
 		}
 		catch (Exception e) {
@@ -268,10 +275,82 @@ public class JUEvalTest {
 						fail(e.getCause().getMessage());
 				}
 				i++;
+				result=null;
 			}
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
+	}
+		
+	@Test
+	public void TestIfEvalRight() 
+	{
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestIfEvalRight.txt") ))
+		{
+			System.setOut(new PrintStream("src/testUnit/EvalTest/TestIfResult.txt"));
+			while (t.hasNext()) 
+			{
+				try
+				{
+					
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
+					method.setAccessible(true);
+					t.next();
+					IfStmt pp =(IfStmt)  method.invoke(p);
+					pp.accept(new TypeCheck());
+					pp.accept(new Eval());
+					
+				}catch(Throwable e)
+				{
+					fail(e.getCause().getMessage());
+				}
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+		
+		
+		ArrayList<String> relustList = new ArrayList<String>();
+		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestIfResult.txt")))
+		{
+			while (s.hasNext())
+			{
+				relustList.add(s.nextLine());
+			}
+		s.close();
+		}catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (Throwable e) {
+			fail("Unexpected error. " + e.getMessage());
+		}
+		
+		ArrayList<String> outPutList = new ArrayList<String>();
+		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestIfOutPut.txt")))
+		{
+			while (s.hasNext())
+			{
+				outPutList.add(s.nextLine());
+			}
+		s.close();
+		}catch (FileNotFoundException e) {
+			fail(e.getMessage());
+		} catch (Throwable e) {
+			fail("Unexpected error. " + e.getMessage());
+		}
+		
+		int index=0;
+		for (String result : relustList) 
+		{	
+			if(outPutList.size()<index)
+				fail("found "+ "nothing" + " expeted "+result);
+			
+			if(!result.equals(outPutList.get(index)))
+				fail("found "+ outPutList.get(index) + " expeted "+result);		
+			index++;
+		}
 	}
 }
