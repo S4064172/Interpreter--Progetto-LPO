@@ -27,6 +27,7 @@ import _3_Ast.Add;
 import _3_Ast.ConCat;
 import _3_Ast.Div;
 import _3_Ast.Fst;
+import _3_Ast.IfStmt;
 import _3_Ast.Length;
 import _3_Ast.Mul;
 import _3_Ast.Pair;
@@ -89,7 +90,10 @@ public class JUTypeCheck {
 					if(result!=null)
 						fail("found "+ result + " expeted "+relustList.get(i));
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				i++;
 			}
@@ -189,7 +193,10 @@ public class JUTypeCheck {
 					if(result!=null)
 						fail("found "+ result + " expeted "+relustList.get(i));
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				i++;
 			}
@@ -268,7 +275,10 @@ public class JUTypeCheck {
 					if(result!=null)
 						fail("found "+ result + " expeted "+"INT");
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				
 			}
@@ -350,7 +360,10 @@ public class JUTypeCheck {
 					if(result!=null)
 						fail("found "+ result + " expeted "+"INT");
 					else
-						fail(e.getCause().getMessage());
+						if(e.getClass().equals(TypecheckerException.class))
+							fail(e.getMessage());
+						else
+							fail(e.getCause().getMessage());
 				}
 				
 			}
@@ -423,6 +436,9 @@ public class JUTypeCheck {
 					WhileStmt pp =  (WhileStmt)method.invoke(p);
 					pp.accept(new TypeCheck());
 				} catch (Exception e) {
+					if(e.getClass().equals(TypecheckerException.class))
+						fail(e.getMessage());
+					else
 						fail(e.getCause().getMessage());
 				}
 			}
@@ -447,6 +463,76 @@ public class JUTypeCheck {
 					method.setAccessible(true);
 					t.next();
 					WhileStmt pp =  (WhileStmt)method.invoke(p);
+					pp.accept(new TypeCheck());
+				}catch(Exception e )
+				{
+					if(!e.getClass().equals(TypecheckerException.class))
+						if(	e.getCause().getClass().equals(ParserException.class) ||
+							e.getCause().getClass().equals(ScannerException.class) ||
+							e.getCause().getClass().equals(IOException.class))
+						{
+								while(!t.tokenString().equals(";") && t.hasNext())
+								{
+									t.next();
+								}
+						}
+						else
+								fail(e.getCause().getMessage());
+				}
+				
+			}
+		} catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+	
+	@Test
+	public void TestIfTypeRight()
+	{
+		
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestIfCheckTypeRight.txt") ))
+		{
+			
+			while (t.hasNext()) 
+			{
+				try
+				{
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
+					method.setAccessible(true);
+					t.next();
+					IfStmt pp =  (IfStmt)method.invoke(p);
+					pp.accept(new TypeCheck());
+				} catch (Exception e) {
+					if(e.getClass().equals(TypecheckerException.class))
+						fail(e.getMessage());
+					else
+						fail(e.getCause().getMessage());
+				}
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+	}
+
+
+	public void TestIfCheckTypeWrong() 
+	{
+		
+		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestIfCheckTypeWrong.txt") ))
+		{
+			while (t.hasNext()) 
+			{
+				try
+				{
+					StreamParser p = new StreamParser(t);
+					Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
+					method.setAccessible(true);
+					t.next();
+					IfStmt pp =  (IfStmt)method.invoke(p);
 					pp.accept(new TypeCheck());
 				}catch(Exception e )
 				{
