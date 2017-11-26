@@ -36,7 +36,7 @@ public class IfStmt implements Stmt {
 
 	@Override
 	public String toString(){
-		return getClass().getSimpleName() + "("+exp+","+ifBlock+ elseBlock==null? ")":","+elseBlock+")" ; 
+		return getClass().getSimpleName() + "("+exp+","+ifBlock+ (elseBlock==null? ")":","+elseBlock)+")" ; 
 	}
 	@Override
 	public <T> T accept(Visitor<T> visitor) {
