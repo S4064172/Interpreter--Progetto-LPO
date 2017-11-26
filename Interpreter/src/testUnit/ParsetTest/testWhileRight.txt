@@ -1,0 +1,3 @@
+while (i<10){print i ; var qwe = 3 + i};
+while (true){ print 5 };
+while ([5]){ print 5 }
