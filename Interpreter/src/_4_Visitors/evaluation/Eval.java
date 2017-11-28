@@ -148,7 +148,34 @@ public class Eval implements Visitor<Value> {
 		return null;
 	}
 /************/
+	@Override
+	public Value visitWhileStmt(Exp exp, StmtSeq block) {
+		
+		while (exp.accept(this).asBool())
+		{
+			env.enterScope();
+			block.accept(this);
+			env.exitScope();
+		}
+		return null;
+	}
 	
+	@Override
+	public Value visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
+		if(exp.accept(this).asBool()){
+			env.enterScope();
+			ifBlock.accept(this);
+			env.exitScope();
+		}
+		else{
+			if (elseBlock==null)
+				return null;
+			env.enterScope();
+			elseBlock.accept(this);
+			env.exitScope();
+		}
+		return null;
+	}
 	@Override
 	public Value visitConCat(Exp left, Exp right) {
 		ListValue result = new LinkedListValue(left.accept(this).asList());

@@ -1,0 +1,6 @@
+IfStmt(Lth(IntLiteral(3),IntLiteral(5)),SingleStmt(PrintStmt(SimpleIdent(x))),SingleStmt(PrintStmt(IntLiteral(15))))
+IfStmt(Lth(SimpleIdent(x),IntLiteral(5)),SingleStmt(PrintStmt(SimpleIdent(x)))))
+IfStmt(BoolLiteral(true),SingleStmt(PrintStmt(SimpleIdent(x)))))
+IfStmt(Eq(SimpleIdent(x),IntLiteral(5)),SingleStmt(PrintStmt(SimpleIdent(x)))))
+IfStmt(Lth(IntLiteral(5),IntLiteral(7)),SingleStmt(PrintStmt(IntLiteral(10)))))
+IfStmt(BoolLiteral(true),SingleStmt(PrintStmt(SimpleIdent(x)))))

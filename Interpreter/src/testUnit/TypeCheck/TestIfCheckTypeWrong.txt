@@ -1,0 +1,3 @@
+if([5]){print 5};
+if(50){print 5};
+if(pair(5,5)){print 5}

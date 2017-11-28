@@ -56,6 +56,9 @@ public interface Visitor<T> {
 
 	T visitVarStmt(Ident ident, Exp exp);
 /************/
+	T visitWhileStmt(Exp exp, StmtSeq block);
+	
+	T visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock);
 	
 	T visitConCat(Exp left, Exp right);
 	

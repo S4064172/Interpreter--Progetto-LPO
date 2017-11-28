@@ -31,6 +31,10 @@ public class AllTest {
 		test.testConCatWrong();
 		test.testTimesOrDivRight();
 		test.testTimesOrDivWrong();
+		test.testWhileRight();
+		test.testWhileWrong();
+		test.testIfRight();
+		test.testIfWrong();
 	}
 	
 	@Test
@@ -45,6 +49,10 @@ public class AllTest {
 		test.TestConCatCheckTypeWrong();
 		test.TestTimesOrDivCheckTypeRight();
 		test.TestTimesOrDivCheckTypeWrong();
+		test.TestWhileCheckTypeRight();
+		test.TestWhileCheckTypeWrong();
+		test.TestIfCheckTypeRight();
+		test.TestIfCheckTypeWrong();
 	}
 	
 	@Test
@@ -55,6 +63,7 @@ public class AllTest {
 		test.TestAddOrSubEvalRight();
 		test.TestConCatEvalRight();
 		test.TestTimesOrDivEvalRight();
+		test.TestIfEvalRight();
 		
 		
 	}
