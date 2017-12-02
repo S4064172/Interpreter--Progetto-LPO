@@ -382,30 +382,30 @@ public class JUTypeCheckTest {
 		
 	}
 	
-/*	@Test
-	public void TestWhileCheckTypeRight()
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"while (5<10){print 5 }",
+			"while (true){print true}"
+	})
+	public void TestWhileCheckTypeRight(String input)
 	{
 		
 		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestWhileCheckTypeRight.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			
-			while (t.hasNext()) 
+			try
 			{
-				try
-				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseWhileStmt", null);
-					method.setAccessible(true);
-					t.next();
-					WhileStmt pp =  (WhileStmt)method.invoke(p);
-					pp.accept(new TypeCheck());
-				} catch (Exception e) {
-					if(e.getClass().equals(TypecheckerException.class))
-						fail(e.getMessage());
-					else
-						fail(e.getCause().getMessage());
-				}
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				WhileStmt resultInvoke =  (WhileStmt)method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+			} catch (Exception e) {
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
 			}
 		}
 		catch (Exception e) {
@@ -413,38 +413,32 @@ public class JUTypeCheckTest {
 		} 
 	}
 
-	@Test
-	public void TestWhileCheckTypeWrong() 
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"while([5]){print 5}", 
+			"while(50){print 5}",
+			"while(pair(5,5)){print 5}"
+	})
+	public void TestWhileCheckTypeWrong_ThrowExecption(String input) 
 	{
 		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestWhileCheckTypeWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (t.hasNext()) 
+			try
 			{
-				try
-				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseWhileStmt", null);
-					method.setAccessible(true);
-					t.next();
-					WhileStmt pp =  (WhileStmt)method.invoke(p);
-					pp.accept(new TypeCheck());
-				}catch(Exception e )
-				{
-					if(!e.getClass().equals(TypecheckerException.class))
-						if(	e.getCause().getClass().equals(ParserException.class) ||
-							e.getCause().getClass().equals(ScannerException.class) ||
-							e.getCause().getClass().equals(IOException.class))
-						{
-								while(!t.tokenString().equals(";") && t.hasNext())
-								{
-									t.next();
-								}
-						}
-						else
-								fail(e.getCause().getMessage());
-				}
-				
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				WhileStmt resultInvoke =  (WhileStmt)method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+			}catch(Exception e )
+			{
+				if( !e.getClass().equals(TypecheckerException.class) &&
+					!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail(e.getCause().getMessage());
 			}
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -452,7 +446,7 @@ public class JUTypeCheckTest {
 		
 	}
 	
-	@Test
+/*	@Test
 	public void TestIfCheckTypeRight()
 	{
 		
