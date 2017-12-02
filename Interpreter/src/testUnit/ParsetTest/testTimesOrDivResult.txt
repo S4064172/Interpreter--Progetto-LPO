@@ -1,3 +1,0 @@
-Mul(IntLiteral(5),IntLiteral(5))
-Div(IntLiteral(5),IntLiteral(10))
-Div(Mul(IntLiteral(5),IntLiteral(10)),IntLiteral(5))
