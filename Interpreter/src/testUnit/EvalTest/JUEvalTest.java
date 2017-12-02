@@ -146,63 +146,47 @@ public class JUEvalTest {
 		} 
 	}
 
-	@Test
-	public void TestAddOrSubEvalRight() 
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'5 + 5','10'",
+		"'5 - 5','0'",
+		"'5 - - 5','10'",
+		"'5 + - 5','0'"
+	})
+	public void TestAddOrSubEvalRight(String input, String resultExpected)
 	{
-		
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestAddOrSubEvalResult.txt")))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
 		{
-			while (s.hasNext())
+			String resultCall = null;
+			try
 			{
-				relustList.add(s.nextLine());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestAddOrSubEvalRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				String result = null;
-				try
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				Object resultInvoke =  method.invoke(parser);
+				if(resultInvoke instanceof Sub)
 				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
-					method.setAccessible(true);
-					t.next();
-					Object pp =  method.invoke(p);
-					if(pp instanceof Sub)
-					{
-						((Sub)pp).accept(new TypeCheck()).toString();
-						result =((Sub)pp).accept(new Eval()).toString();
-					}
-					else
-					{
-						((Add)pp).accept(new TypeCheck()).toString();
-						result =((Add)pp).accept(new Eval()).toString();
-					}
-				
-				
-					assertTrue(result.equals(relustList.get(i)));
-				}catch(Throwable e)
-				{
-					if(result!=null)
-						fail("found "+ result + " expeted "+relustList.get(i));
-					else
-						if(e.getClass().equals(TypecheckerException.class))
-							fail(e.getMessage());
-						else
-							fail(e.getCause().getMessage());
+					((Sub)resultInvoke).accept(new TypeCheck()).toString();
+					resultCall =((Sub)resultInvoke).accept(new Eval()).toString();
 				}
-				i++;
-				result=null;
+				else
+				{
+					((Add)resultInvoke).accept(new TypeCheck()).toString();
+					resultCall =((Add)resultInvoke).accept(new Eval()).toString();
+				}
+			
+				assertThat(resultCall, is(resultExpected));
+				
+			}catch(Exception e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
 			}
+		
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
