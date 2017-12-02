@@ -1,21 +1,22 @@
 package testUnit.ParsetTest;
 
-import static _2_TokenType.TokenType.*;
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import javax.naming.ldap.ManageReferralControl;
-
+import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import _1_StreamScanner.ScannerException;
 import _2_StreamParser.ParserException;
@@ -25,82 +26,84 @@ import _2_Tokenizer.Tokenizer;
 
 public class JUParsetTest {
 
-	@Test
-	public void testNewAtomRight()
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'length [5,2,3]' , 'Length(ListLiteral(MoreExp(IntLiteral(5),MoreExp(IntLiteral(2),SingleExp(IntLiteral(3))))))'",
+		"'length [[pair(5,6)],[5,5,5]]' , 'Length(ListLiteral(MoreExp(ListLiteral(SingleExp(Pair(IntLiteral(5),IntLiteral(6)))),SingleExp(ListLiteral(MoreExp(IntLiteral(5),MoreExp(IntLiteral(5),SingleExp(IntLiteral(5)))))))))'", 
+		"'snd pair(pair(5,5),pair([3],[5]))' , 'Snd(Pair(Pair(IntLiteral(5),IntLiteral(5)),Pair(ListLiteral(SingleExp(IntLiteral(3))),ListLiteral(SingleExp(IntLiteral(5))))))'", 
+		"'snd pair([5],[5])' , 'Snd(Pair(ListLiteral(SingleExp(IntLiteral(5))),ListLiteral(SingleExp(IntLiteral(5)))))'",
+		"'snd pair (5,5)' , 'Snd(Pair(IntLiteral(5),IntLiteral(5)))'",
+		"'fst pair(pair(5,5),pair([3],[5]))' , 'Fst(Pair(Pair(IntLiteral(5),IntLiteral(5)),Pair(ListLiteral(SingleExp(IntLiteral(3))),ListLiteral(SingleExp(IntLiteral(5))))))'",
+		"'fst pair([5],[5])' , 'Fst(Pair(ListLiteral(SingleExp(IntLiteral(5))),ListLiteral(SingleExp(IntLiteral(5)))))'",
+		"'fst pair (5,5)' , 'Fst(Pair(IntLiteral(5),IntLiteral(5)))'",
+		"'pair(pair(5,5),pair([3],[5]))' , 'Pair(Pair(IntLiteral(5),IntLiteral(5)),Pair(ListLiteral(SingleExp(IntLiteral(3))),ListLiteral(SingleExp(IntLiteral(5)))))'",
+		"'pair([5],[5])' , 'Pair(ListLiteral(SingleExp(IntLiteral(5))),ListLiteral(SingleExp(IntLiteral(5))))'",
+		"'pair (5,5)' , 'Pair(IntLiteral(5),IntLiteral(5))'"
+	})
+	public void testNewAtomRight(String input, String resultExpected)
 	{
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/ParsetTest/testNewAtomResult.txt")))
+		
+		String resultCall=null;
+																	//to convert string to inputStream
+		try(Tokenizer t = new StreamTokenizer( new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
-			while (s.hasNext())
+			
+			StreamParser p = new StreamParser(t);
+			Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+			method.setAccessible(true);
+			t.next();
+			try
 			{
-				relustList.add(s.next());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		String result=null;
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testNewAtomRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					result= method.invoke(p).toString();
-					assertTrue(result.equals(relustList.get(i)));
-					i++;
-				}catch (Exception e) {
-					fail(e.getCause().getMessage());
-				} 
-			}
+				resultCall= method.invoke(p).toString();
+				assertThat(resultCall, is(resultExpected));
+			}catch (Exception e) {
+				fail(e.getCause().getMessage());
+			} 
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
-		} 
+		}
 		
 	}
 	
-	@Test
-	public void testNewAtomWrong()
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"length [5,5,5,]",
+			"length []",
+			"snd [5,]",
+			"fst [5,5",
+			"pair(5],[5])",
+			"pair[5],[5])",
+			"pair([5],[5)",
+			"pair([5],[5]",
+			
+	})
+	public void testNewAtomWrong_ThrowExecption(String input)
 	{
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testNewAtomWrong.txt") ))
+		try(Tokenizer t = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (t.hasNext()) 
+			
+			StreamParser p = new StreamParser(t);
+			Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+			method.setAccessible(true);
+			t.next();
+			try
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					String res =method.invoke(p).toString();
-					fail("correst -->"+res);
-				}catch (Exception e) 
-				{
-				
-					if(	e.getCause().getClass().equals(ParserException.class) ||
-						e.getCause().getClass().equals(ScannerException.class) ||
-						e.getCause().getClass().equals(IOException.class))
-					{
-						while(!t.tokenString().equals(";") && t.hasNext())
-						{
-							t.next();
-						}
-					}
-					else
-						fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
-								+ScannerException.class+"OR"
-								+ IOException.class);
-					
-				} 
-			}
+				String res =method.invoke(p).toString();
+				fail("correst -->"+res);
+			}catch (Exception e) 
+			{
+			
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+					fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+							+ScannerException.class+"OR"
+							+ IOException.class);
+			} 
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
