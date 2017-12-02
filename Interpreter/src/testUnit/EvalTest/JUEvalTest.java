@@ -4,6 +4,7 @@ package testUnit.EvalTest;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -239,77 +240,43 @@ public class JUEvalTest {
 		} 
 	}
 		
-	@Test
-	public void TestIfEvalRight() 
-	{
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestIfEvalRight.txt") ))
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'if (3<05) {	var x = 5;	print x}else{	print 15}','5'",
+		"'if (true) {	print 5}','5'",
+		"'if (5<07){	print  10}','10'"
+	})
+	public void TestIfEvalRight(String input, String resultExpected)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
 		{
-			System.setOut(new PrintStream("src/testUnit/EvalTest/TestIfResult.txt"));
-			while (t.hasNext()) 
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
 			{
-				try
-				{
-					
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
-					method.setAccessible(true);
-					t.next();
-					IfStmt pp =(IfStmt)  method.invoke(p);
-					pp.accept(new TypeCheck());
-					pp.accept(new Eval());
-					
-				}catch(Throwable e)
-				{
-					if(e.getClass().equals(TypecheckerException.class))
-						fail(e.getMessage());
-					else
-						fail(e.getCause().getMessage());
-				}
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				IfStmt resultInvoke =(IfStmt)  method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				String resutlString =resultCall.toString();
+				resutlString = resutlString.substring(0, resutlString.length()-2);
+				assertThat(resutlString, is(resultExpected));
+			}catch(Exception e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
 			}
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
 		System.setOut(System.out);
-		
-		
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestIfResult.txt")))
-		{
-			while (s.hasNext())
-			{
-				relustList.add(s.nextLine());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		
-		ArrayList<String> outPutList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestIfOutPut.txt")))
-		{
-			while (s.hasNext())
-			{
-				outPutList.add(s.nextLine());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		
-		int index=0;
-		for (String result : relustList) 
-		{	
-			if(outPutList.size()<index)
-				fail("found "+ "nothing" + " expeted "+result);
-			
-			if(!result.equals(outPutList.get(index)))
-				fail("found "+ outPutList.get(index) + " expeted "+result);		
-			index++;
-		}
 	}
 }
