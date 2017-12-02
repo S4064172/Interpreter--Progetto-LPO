@@ -160,7 +160,7 @@ public class JUTypeCheckTest {
 				ConCat resultInvoke =  (ConCat)method.invoke(parser);
 				resultCall=resultInvoke.accept(new TypeCheck()).toString();
 				assertThat(resultCall, is(resultExpected));
-			}catch(Throwable e)
+			}catch(Exception e)
 			{
 				if(e.getClass().equals(TypecheckerException.class))
 					fail(e.getMessage());
@@ -234,7 +234,7 @@ public class JUTypeCheckTest {
 				else
 					resultCall=((Add)resultInvoke).accept(new TypeCheck()).toString();
 				assertThat(resultCall, is("INT"));
-			}catch(Throwable e)
+			}catch(Exception e)
 			{
 				if(e.getClass().equals(TypecheckerException.class))
 					fail(e.getMessage());
@@ -316,7 +316,7 @@ public class JUTypeCheckTest {
 				else
 					resutlCall=((Mul)resultInvoke).accept(new TypeCheck()).toString();
 				assertThat(resutlCall, is("INT"));
-			}catch(Throwable e)
+			}catch(Exception e)
 			{
 				if(e.getClass().equals(TypecheckerException.class))
 					fail(e.getMessage());
