@@ -193,63 +193,46 @@ public class JUEvalTest {
 		} 
 	}
 	
-	@Test
-	public void TestTimesOrDivEvalRight() 
-	{
-		
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestTimesOrDivEvalResult.txt")))
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'5 * 5','25'",
+		"'5 / 10','0'",
+		"'5 * 10 / 5','10'"
+	})
+	public void TestTimesOrDivEvalRight(String input, String resultExpected)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
 		{
-			while (s.hasNext())
+			
+			String resultCall = null;
+			try
 			{
-				relustList.add(s.nextLine());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestTimesOrDivEvalRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				String result = null;
-				try
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				Object resultInvoke =  method.invoke(parser);
+				if(resultInvoke instanceof Div)
 				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
-					method.setAccessible(true);
-					t.next();
-					Object pp =  method.invoke(p);
-					if(pp instanceof Div)
-					{
-						((Div)pp).accept(new TypeCheck()).toString();
-						result =((Div)pp).accept(new Eval()).toString();
-					}
-					else
-					{
-						((Mul)pp).accept(new TypeCheck()).toString();
-						result =((Mul)pp).accept(new Eval()).toString();
-					}
-				
-				
-					assertTrue(result.equals(relustList.get(i)));
-				}catch(Throwable e)
-				{
-					if(result!=null)
-						fail("found "+ result + " expeted "+relustList.get(i));
-					else
-						if(e.getClass().equals(TypecheckerException.class))
-							fail(e.getMessage());
-						else
-							fail(e.getCause().getMessage());
+					((Div)resultInvoke).accept(new TypeCheck()).toString();
+					resultCall =((Div)resultInvoke).accept(new Eval()).toString();
 				}
-				i++;
-				result=null;
+				else
+				{
+					((Mul)resultInvoke).accept(new TypeCheck()).toString();
+					resultCall =((Mul)resultInvoke).accept(new Eval()).toString();
+				}
+			
+				assertThat(resultCall, is(resultExpected));
+			}catch(Exception e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
 			}
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
