@@ -3,17 +3,22 @@ package testUnit.EvalTest;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import static org.hamcrest.CoreMatchers.*;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import _1_StreamScanner.ScannerException;
 import _2_StreamParser.ParserException;
@@ -40,76 +45,63 @@ import _4_Visitors.typechecking.TypecheckerException;
 
 public class JUEvalTest {
 
-	@Test
-	public void TestNewAtomEvalRight() {
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'length [5,2,3]' , 3",
+		"'snd pair(pair(5,5),pair([3],[5]))' , '([3],[5])'", 
+		"'snd pair([5],[5])' , '[5]'",
+		"'snd pair (5,5)' , '5'",
+		"'fst pair(pair(5,5),pair([3],[5]))' , '(5,5)'",
+		"'fst pair([5],[5])' , '[5]'",
+		"'fst pair (5,5)' , '5'",
+		"'pair(pair(5,5),pair([3],[5]))' , '((5,5),([3],[5]))'",
+		"'pair([5],[5])' , '([5],[5])'",
+		"'pair (5,5)' , '(5,5)'"
+	})
+	public void TestNewAtomEvalRight(String input, String resultExpected) {
 		
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/EvalTest/TestNewAtomEvalResult.txt")))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
-			while (s.hasNext())
-			{
-				relustList.add(s.next());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/EvalTest/TestNewAtomEvalRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				String result = null;
+				String resultCall = null;
 				try
 				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+					StreamParser parser = new StreamParser(tokenizer);
+					Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
 					method.setAccessible(true);
-					t.next();
-					Object pp =  method.invoke(p);
-					if (pp instanceof Pair)
+					tokenizer.next();
+					Object resultInvoke =  method.invoke(parser);
+					if (resultInvoke instanceof Pair)
 					{
-						((Pair) pp).accept(new TypeCheck());
-						result =((Pair) pp).accept(new Eval()).toString();
+						((Pair) resultInvoke).accept(new TypeCheck());
+						resultCall =((Pair) resultInvoke).accept(new Eval()).toString();
 					}
 					else
-						if (pp instanceof Length)
+						if (resultInvoke instanceof Length)
 						{
-							((Length) pp).accept(new TypeCheck());
-							result =((Length) pp).accept(new Eval()).toString();
+							((Length) resultInvoke).accept(new TypeCheck());
+							resultCall =((Length) resultInvoke).accept(new Eval()).toString();
 						}
 						else
-							if (pp instanceof Fst)
+							if (resultInvoke instanceof Fst)
 							{
-								((Fst) pp).accept(new TypeCheck());
-								result = ((Fst) pp).accept(new Eval()).toString();
+								((Fst) resultInvoke).accept(new TypeCheck());
+								resultCall = ((Fst) resultInvoke).accept(new Eval()).toString();
 							}
 							else
-								if (pp instanceof Snd)
-								{
-									((Snd) pp).accept(new TypeCheck());
-									result = ((Snd) pp).accept(new Eval()).toString();
-								}
-								else
-									fail("error type");
-					
-					assertTrue(result.equals(relustList.get(i)));
-				}catch(Throwable e)
+							{
+								((Snd) resultInvoke).accept(new TypeCheck());
+								resultCall = ((Snd) resultInvoke).accept(new Eval()).toString();
+							}
+							
+					assertThat(resultCall, is(resultExpected));
+				}catch(Exception e)
 				{
-					if(result!=null)
-						fail("found "+ result + " expeted "+relustList.get(i));
-					else
-						if(e.getClass().equals(TypecheckerException.class))
+					if(e.getClass().equals(TypecheckerException.class))
 							fail(e.getMessage());
 						else
 							fail(e.getCause().getMessage());
-				}
-				i++;
-				result=null;
-			}
+				}		
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
