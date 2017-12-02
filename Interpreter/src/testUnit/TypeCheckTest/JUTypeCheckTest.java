@@ -1,21 +1,28 @@
-package testUnit.TypeCheck;
+package testUnit.TypeCheckTest;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import static org.hamcrest.CoreMatchers.*;
 import javax.sound.midi.SysexMessage;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 import org.junit.experimental.theories.suppliers.TestedOn;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import _1_StreamScanner.ScannerException;
 import _2_StreamParser.ParserException;
@@ -38,79 +45,82 @@ import _3_Ast.WhileStmt;
 import _4_Visitors.typechecking.TypeCheck;
 import _4_Visitors.typechecking.TypecheckerException;
 
-public class JUTypeCheck {
+public class JUTypeCheckTest {
 
-	@Test
-	public void TestNewAtomCheckTypeRight()
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'length [5,2,3]' , INT",
+		"'snd pair(pair(5,5),pair([3],[5]))' , '(INT LIST,INT LIST)'", 
+		"'snd pair([5],[5])' , 'INT LIST'",
+		"'snd pair (5,5)' , 'INT'",
+		"'fst pair(pair(5,5),pair([3],[5]))' , '(INT,INT)'",
+		"'fst pair([5],[5])' , 'INT LIST'",
+		"'fst pair (5,5)' , 'INT'",
+		"'pair(pair(5,5),pair([3],[5]))' , '((INT,INT),(INT LIST,INT LIST))'",
+		"'pair([5],[5])' , '(INT LIST,INT LIST)'",
+		"'pair (5,5)' , '(INT,INT)'"
+	})
+	public void TestNewAtomCheckTypeRight(String input, String resultExpected)
 	{
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/TypeCheck/TestNewAtomCheckTypeResult.txt")))
-		{
-			while (s.hasNext())
-			{
-				relustList.add(s.nextLine());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
 		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestNewAtomCheckTypeRight.txt") ))
+		try(Tokenizer t = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
-			String result=null;
-			while (t.hasNext()) 
+			String resultCall=null;
+			
+			try
 			{
-				try
-				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseAtom", null);
-					method.setAccessible(true);
-					t.next();
-					Object pp =  method.invoke(p);
-					if (pp instanceof Pair)
-						result=((Pair) pp).accept(new TypeCheck()).toString();
+				StreamParser p = new StreamParser(t);
+				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+				method.setAccessible(true);
+				t.next();
+				Object pp =  method.invoke(p);
+				if (pp instanceof Pair)
+					resultCall=((Pair) pp).accept(new TypeCheck()).toString();
+				else
+					if (pp instanceof Length)
+						resultCall=((Length) pp).accept(new TypeCheck()).toString();
 					else
-						if (pp instanceof Length)
-							result=((Length) pp).accept(new TypeCheck()).toString();
+						if (pp instanceof Fst)
+							resultCall=((Fst) pp).accept(new TypeCheck()).toString();
 						else
-							if (pp instanceof Fst)
-								result=((Fst) pp).accept(new TypeCheck()).toString();
+							if (pp instanceof Snd)
+								resultCall=((Snd) pp).accept(new TypeCheck()).toString();
 							else
-								if (pp instanceof Snd)
-									result=((Snd) pp).accept(new TypeCheck()).toString();
-								else
-									fail("error type");
-					
-					assertTrue(result.equals(relustList.get(i)));
-				}catch(Throwable e)
-				{
-					if(result!=null)
-						fail("found "+ result + " expeted "+relustList.get(i));
-					else
-						if(e.getClass().equals(TypecheckerException.class))
-							fail(e.getMessage());
-						else
-							fail(e.getCause().getMessage());
-				}
-				i++;
-				result=null;
-			}
+								fail("error type");
+				
+				assertThat(resultCall, is(resultExpected));
+			}catch(IOException e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
+			}			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
 	}
-	
-	@Test
-	public void TestNewAtomCheckTypeWrong() 
+
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"length [[pair(5,6)],[5,5,5]]",
+			"length [[pair(5,6)],5]",
+			"length [[5],5]",
+			"length 5",
+			"fst 5",
+			"fst (5)",
+			"snd 5",
+			"fst [5,5]",
+			"snd ([5,5])"
+			
+	})
+	public void TestNewAtomCheckTypeWrong_ThrowExecption(String input) 
 	{
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestNewAtomCheckTypeWrong.txt") ))
+		try(Tokenizer t = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
-			while (t.hasNext()) 
-			{
+			
 				StreamParser p = new StreamParser(t);
 				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
 				method.setAccessible(true);
@@ -135,27 +145,19 @@ public class JUTypeCheck {
 					fail("riconosciuto");
 				}catch(Exception e )
 				{
-					if(!e.getClass().equals(TypecheckerException.class))
-						if(	e.getCause().getClass().equals(ParserException.class) ||
-							e.getCause().getClass().equals(ScannerException.class) ||
-							e.getCause().getClass().equals(IOException.class))
-						{
-								while(!t.tokenString().equals(";") && t.hasNext())
-								{
-									t.next();
-								}
-						}
-						else
+					if( !e.getClass().equals(TypecheckerException.class) &&
+						!e.getCause().getClass().equals(ParserException.class) &&
+						!e.getCause().getClass().equals(ScannerException.class) &&
+						!e.getCause().getClass().equals(IOException.class))
 								fail(e.getCause().getMessage());
 				}
 				
-			}
 		} catch (Exception e) {
 			fail(e.getMessage());
 		} 
 		
 	}
-
+/*
 	@Test
 	public void TestConCatCheckTypeRight()
 	{
@@ -558,4 +560,5 @@ public class JUTypeCheck {
 		} 
 		
 	}
+	*/
 }
