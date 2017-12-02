@@ -1,4 +1,4 @@
-package testUnit.TypeCheckTest;
+package testUnit;
 
 import static org.junit.Assert.*;
 
