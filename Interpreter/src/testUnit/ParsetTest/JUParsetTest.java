@@ -46,16 +46,16 @@ public class JUParsetTest {
 		
 		String resultCall=null;
 																	//to convert string to inputStream
-		try(Tokenizer t = new StreamTokenizer( new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
+		try(Tokenizer tokenizer = new StreamTokenizer( new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
 			
-			StreamParser p = new StreamParser(t);
-			Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
 			method.setAccessible(true);
-			t.next();
+			tokenizer.next();
 			try
 			{
-				resultCall= method.invoke(p).toString();
+				resultCall= method.invoke(parser).toString();
 				assertThat(resultCall, is(resultExpected));
 			}catch (Exception e) {
 				fail(e.getCause().getMessage());
@@ -82,17 +82,17 @@ public class JUParsetTest {
 	})
 	public void testNewAtomWrong_ThrowExecption(String input)
 	{
-		try(Tokenizer t = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			
-			StreamParser p = new StreamParser(t);
-			Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
 			method.setAccessible(true);
-			t.next();
+			tokenizer.next();
 			try
 			{
-				String res =method.invoke(p).toString();
-				fail("correst -->"+res);
+				String resultInvoke =method.invoke(parser).toString();
+				fail("recognised -->"+input);
 			}catch (Exception e) 
 			{
 			
