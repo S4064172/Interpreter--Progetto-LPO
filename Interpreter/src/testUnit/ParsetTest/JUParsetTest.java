@@ -314,42 +314,28 @@ public class JUParsetTest {
 		} 
 		
 	}
-	
-	@Test
-	public void testWhileRight()
+
+	@ParameterizedTest()
+	@CsvSource({
+		"'while (i<10){print i ; var qwe = 3 + i}','WhileStmt(Lth(SimpleIdent(i),IntLiteral(10)),MoreStmt(PrintStmt(SimpleIdent(i)),SingleStmt(VarStmt(SimpleIdent(qwe),Add(IntLiteral(3),SimpleIdent(i))))))'",
+		"'while (true){ print 5 }','WhileStmt(BoolLiteral(true),SingleStmt(PrintStmt(IntLiteral(5))))'",
+		"'while ([5]){ print 5 }','WhileStmt(ListLiteral(SingleExp(IntLiteral(5))),SingleStmt(PrintStmt(IntLiteral(5))))'"
+	})
+	public void testWhileRight(String input, String resultExpected)
 	{
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/ParsetTest/testWhileResult.txt")))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (s.hasNext())
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
 			{
-				relustList.add(s.next());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		String result=null;
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testWhileRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseWhileStmt", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					result= method.invoke(p).toString();
-					assertTrue(result.equals(relustList.get(i)));
-					i++;
-				}catch (Exception e) {
-					fail(e.getCause().getMessage());
-				} 
-			}
+				String result= method.invoke(parser).toString();
+				assertThat(result, is(resultExpected));
+			}catch (Exception e) {
+				fail(e.getCause().getMessage());
+			} 
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
@@ -357,40 +343,34 @@ public class JUParsetTest {
 		
 	}
 	
-	@Test
-	public void testWhileWrong()
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"while(5){}",
+			"while(){}"
+	})
+	public void testWhileWrong_ThrowExecption(String input)
 	{
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testWhileWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (t.hasNext()) 
+			
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseWhileStmt", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					String res =method.invoke(p).toString();
-					fail("correst -->"+res);
-				}catch (Exception e) 
-				{
-				
-					if(	e.getCause().getClass().equals(ParserException.class) ||
-						e.getCause().getClass().equals(ScannerException.class) ||
-						e.getCause().getClass().equals(IOException.class))
-					{
-						while(!t.tokenString().equals(";") && t.hasNext())
-						{
-							t.next();
-						}
-					}
-					else
-						fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
-								+ScannerException.class+"OR"
-								+ IOException.class);
-					
-				} 
-			}
+				method.invoke(parser).toString();
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+							+ScannerException.class+"OR"
+							+ IOException.class);
+			} 
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
