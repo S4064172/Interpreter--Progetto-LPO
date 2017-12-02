@@ -77,7 +77,7 @@ public class JUParsetTest {
 			"pair(5],[5])",
 			"pair[5],[5])",
 			"pair([5],[5)",
-			"pair([5],[5]",
+			"pair([5],[5]"
 			
 	})
 	public void testNewAtomWrong_ThrowExecption(String input)
@@ -91,7 +91,7 @@ public class JUParsetTest {
 			tokenizer.next();
 			try
 			{
-				String resultInvoke =method.invoke(parser).toString();
+				method.invoke(parser).toString();
 				fail("recognised -->"+input);
 			}catch (Exception e) 
 			{
@@ -110,90 +110,70 @@ public class JUParsetTest {
 		} 
 		
 	}
-
-	@Test
-	public void testConCatRight()
-	{
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/ParsetTest/testConCatResult.txt")))
-		{
-			while (s.hasNext())
-			{
-				relustList.add(s.next());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		String result=null;
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testConCatRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseConCat", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					result= method.invoke(p).toString();
-					assertTrue(result.equals(relustList.get(i)));
-					i++;
-				}catch (Exception e) {
-					fail(e.getCause().getMessage());
-				} 
-			}
-		}
-		catch (Exception e) {
-			fail(e.getMessage());
-		} 
-		
-	}
 	
-	@Test
-	public void testConCatWrong()
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'[1] @ [1]','ConCat(ListLiteral(SingleExp(IntLiteral(1))),ListLiteral(SingleExp(IntLiteral(1))))'",
+		"'[pair(1,2)] @ [1]','ConCat(ListLiteral(SingleExp(Pair(IntLiteral(1),IntLiteral(2)))),ListLiteral(SingleExp(IntLiteral(1))))'",
+		"'[true] @ [1]','ConCat(ListLiteral(SingleExp(BoolLiteral(true))),ListLiteral(SingleExp(IntLiteral(1))))'",
+		"'[pair(1,2)] @ [true]','ConCat(ListLiteral(SingleExp(Pair(IntLiteral(1),IntLiteral(2)))),ListLiteral(SingleExp(BoolLiteral(true))))'"
+	})
+	public void testConCatRight(String input, String resultExpected)
 	{
-		
-		String result=null;
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testConCatWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (t.hasNext()) 
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseConCat", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					String res =method.invoke(p).toString();
-					fail("correst -->"+res);
-				}catch (Exception e) 
-				{
+				String resultInvoke = method.invoke(parser).toString();
+				assertThat(resultInvoke, is(resultExpected));
 				
-					if(	e.getCause().getClass().equals(ParserException.class) ||
-						e.getCause().getClass().equals(ScannerException.class) ||
-						e.getCause().getClass().equals(IOException.class))
-					{
-						while(!t.tokenString().equals(";") && t.hasNext())
-						{
-							t.next();
-						}
-					}
-					else
-						fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
-								+ScannerException.class+"OR"
-								+ IOException.class);
-					
-				} 
-			}
+			}catch (Exception e) {
+				fail(e.getCause().getMessage());
+			} 
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
-		
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"[] @ [1]",
+			"[] @",
+			"[1] @ []",
+			"@ []",
+			"@"	
+	})
+	public void testConCatWrong_ThrowExecption(String input)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				method.invoke(parser);
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+						fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+							+ScannerException.class+"OR"
+							+ IOException.class);
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
 	}
 	
 	@Test
