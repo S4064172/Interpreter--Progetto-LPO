@@ -83,15 +83,7 @@ public class JUTypeCheckTest {
 						if (resultInvoke instanceof Fst)
 							resultCall=((Fst) resultInvoke).accept(new TypeCheck()).toString();
 						else
-							if (resultInvoke instanceof Snd)
-								resultCall=((Snd) resultInvoke).accept(new TypeCheck()).toString();
-							else
-								fail("error type=>found"+resultInvoke.getClass() + "expected " 
-										+Pair.class+"OR"+
-										Length.class+"OR"+
-										Fst.class+"OR"+
-										Snd.class+"OR"+
-										Pair.class);
+							resultCall=((Snd) resultInvoke).accept(new TypeCheck()).toString();
 				
 				assertThat(resultCall, is(resultExpected));
 			}catch(IOException e)
@@ -142,15 +134,8 @@ public class JUTypeCheckTest {
 							if (resultInvoke instanceof Fst)
 								((Fst) resultInvoke).accept(new TypeCheck());
 							else
-								if (resultInvoke instanceof Snd)
-									((Snd) resultInvoke).accept(new TypeCheck());
-								else
-									fail("error type=>found"+resultInvoke.getClass() + "expected " 
-											+Pair.class+"OR"+
-											Length.class+"OR"+
-											Fst.class+"OR"+
-											Snd.class+"OR"+
-											Pair.class);
+								((Snd) resultInvoke).accept(new TypeCheck());
+								
 					fail("recognised : "+input);
 				}catch(Exception e )
 				{
@@ -186,8 +171,8 @@ public class JUTypeCheckTest {
 				Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
 				method.setAccessible(true);
 				tokenizer.next();
-				ConCat pp =  (ConCat)method.invoke(parser);
-				resultCall=pp.accept(new TypeCheck()).toString();
+				ConCat resultInvoke =  (ConCat)method.invoke(parser);
+				resultCall=resultInvoke.accept(new TypeCheck()).toString();
 				assertThat(resultCall, is(resultExpected));
 			}catch(Throwable e)
 			{
@@ -206,7 +191,7 @@ public class JUTypeCheckTest {
 
 	@ParameterizedTest
 	@ValueSource(strings = {
-			"[5] @ [[5]]2",
+			"[5] @ [[5]]",
 			"[pair(5,5)] @ [true]",
 			"[5] @ [true]"				
 	})
@@ -238,91 +223,90 @@ public class JUTypeCheckTest {
 		
 	}
 
-/*	@Test
-	public void TestAddOrSubCheckTypeRight()
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"5 + 5",
+			"5 - 5",
+			"5 - - 5",
+			"5 + - 5"	
+	})
+	public void TestAddOrSubCheckTypeRight(String input)
 	{
-		
-		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestAddOrSubCheckTypeRight.txt") ))
+
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			String result=null;
-			while (t.hasNext()) 
+			try
 			{
-				try
-				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
-					method.setAccessible(true);
-					t.next();
-					Object pp =  method.invoke(p);
-					if(pp instanceof Sub)
-						result=((Sub)pp).accept(new TypeCheck()).toString();
-					else
-						result=((Add)pp).accept(new TypeCheck()).toString();
-				
-					assertTrue(result.equals("INT"));
-				}catch(Throwable e)
-				{
-					if(result!=null)
-						fail("found "+ result + " expeted "+"INT");
-					else
-						if(e.getClass().equals(TypecheckerException.class))
-							fail(e.getMessage());
-						else
-							fail(e.getCause().getMessage());
-				}
-				result=null;
+				String resultCall;
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				Object resultInvoke =  method.invoke(parser);
+				if(resultInvoke instanceof Sub)
+					resultCall=((Sub)resultInvoke).accept(new TypeCheck()).toString();
+				else
+					resultCall=((Add)resultInvoke).accept(new TypeCheck()).toString();
+				assertThat(resultCall, is("INT"));
+			}catch(Throwable e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
 			}
+			
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
 	}
 
-	@Test
-	public void TestAddOrSubCheckTypeWrong() 
+	@ParameterizedTest()
+	@ValueSource(strings = {
+			"[5] + [5]",
+			"true + true",
+			"pair(5,5) + true",
+			"[5] - pair (5,5)",
+			"[5] - [5]",
+			"true - true",
+			"pair(5,5) - true",
+			"[5] + pair (5,5)"
+	})
+	public void TestAddOrSubCheckTypeWrong_ThrowExecption(String input) 
 	{
 		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestAddOrSubCheckTypeWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (t.hasNext()) 
+			
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAddOrSub", null);
-				method.setAccessible(true);
-				t.next();
-				String result;
-				try
-				{
-					Object pp =  method.invoke(p);
-					if(pp instanceof Sub)
-						result=((Sub)pp).accept(new TypeCheck()).toString();
-					else
-						result=((Add)pp).accept(new TypeCheck()).toString();
-					fail("riconosciuto-->"+result);
-				}catch(Exception e )
-				{
-					if(!e.getClass().equals(TypecheckerException.class))
-						if(	e.getCause().getClass().equals(ParserException.class) ||
-							e.getCause().getClass().equals(ScannerException.class) ||
-							e.getCause().getClass().equals(IOException.class))
-						{
-								while(!t.tokenString().equals(";") && t.hasNext())
-								{
-									t.next();
-								}
-						}
-						else
-								fail(e.getCause().getMessage());
-				}
-				
+				Object resultInvoke =  method.invoke(parser);
+				if(resultInvoke instanceof Sub)
+					((Sub)resultInvoke).accept(new TypeCheck()).toString();
+				else
+					((Add)resultInvoke).accept(new TypeCheck()).toString();
+				fail("recognised --> "+input);
+			}catch(Exception e )
+			{
+				if( !e.getClass().equals(TypecheckerException.class) &&
+					!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+						fail(e.getCause().getMessage());
 			}
+			
 		} catch (Exception e) {
 			fail(e.getMessage());
 		} 
 		
 	}
-	
+/*	
 	@Test
 	public void TestTimesOrDivCheckTypeRight()
 	{
