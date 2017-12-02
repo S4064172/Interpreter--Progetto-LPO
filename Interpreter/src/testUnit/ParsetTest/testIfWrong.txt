@@ -1,7 +1,0 @@
-if(){};
-if(){print x};
-if(true)
-{
-	print x
-}
-else{}
