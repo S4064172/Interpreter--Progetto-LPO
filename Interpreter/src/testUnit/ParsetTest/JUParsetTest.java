@@ -3,24 +3,15 @@ package testUnit.ParsetTest;
 
 import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Scanner;
-
-import javax.print.attribute.standard.MediaSize.NA;
-
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import _1_StreamScanner.ScannerException;
 import _2_StreamParser.ParserException;
 import _2_StreamParser.StreamParser;
@@ -378,41 +369,29 @@ public class JUParsetTest {
 		
 	}
 	
-	@Test
-	public void testIfRight()
+	@ParameterizedTest()
+	@CsvSource({
+		"'if (3<05){ print x }else{ print 15 }','IfStmt(Lth(IntLiteral(3),IntLiteral(5)),SingleStmt(PrintStmt(SimpleIdent(x))),SingleStmt(PrintStmt(IntLiteral(15))))'",
+		"'if (x<5){ print x }','IfStmt(Lth(SimpleIdent(x),IntLiteral(5)),SingleStmt(PrintStmt(SimpleIdent(x)))))'",
+		"'if (true){ print x }','IfStmt(BoolLiteral(true),SingleStmt(PrintStmt(SimpleIdent(x)))))'",
+		"'if (x==5){ print x }','IfStmt(Eq(SimpleIdent(x),IntLiteral(5)),SingleStmt(PrintStmt(SimpleIdent(x)))))'",
+		"'if (5<07){ print  10 }','IfStmt(Lth(IntLiteral(5),IntLiteral(7)),SingleStmt(PrintStmt(IntLiteral(10)))))'"
+	})
+	public void testIfRight(String input,String resultExpected)
 	{
-		ArrayList<String> relustList = new ArrayList<String>();
-		try(Scanner s = new Scanner(new File("src/testUnit/ParsetTest/testIfResult.txt")))
+		try(Tokenizer tokenizr = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (s.hasNext())
+			StreamParser parser = new StreamParser(tokenizr);
+			Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+			method.setAccessible(true);
+			tokenizr.next();
+			try
 			{
-				relustList.add(s.next());
-			}
-		s.close();
-		}catch (FileNotFoundException e) {
-			fail(e.getMessage());
-		} catch (Throwable e) {
-			fail("Unexpected error. " + e.getMessage());
-		}
-		int i = 0;
-		String result=null;
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testIfRight.txt") ))
-		{
-			while (t.hasNext()) 
-			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					result= method.invoke(p).toString();
-					assertTrue(result.equals(relustList.get(i)));
-					i++;
-				}catch (Exception e) {
-					fail(e.getCause().getMessage());
-				} 
-			}
+				String resultInvoke= method.invoke(parser).toString();
+				assertThat(resultInvoke, is(resultExpected));
+			}catch (Exception e) {
+				fail(e.getCause().getMessage());
+			} 
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
@@ -420,47 +399,40 @@ public class JUParsetTest {
 		
 	}
 	
-	@Test
-	public void testIfWrong()
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"if(){}",
+			"if(){print x}",
+			"if(true){print x}else{}"
+	})
+	public void testIfWrong_ThrowExecption(String input)
 	{
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testIfWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testIfWrong.txt") ))
 		{
-			while (t.hasNext()) 
+			
+			StreamParser p = new StreamParser(tokenizer);
+			Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
-				method.setAccessible(true);
-				t.next();
-				try
-				{
-					String res =method.invoke(p).toString();
-					fail("correst -->"+res);
-				}catch (Exception e) 
-				{
-				
-					if(	e.getCause().getClass().equals(ParserException.class) ||
-						e.getCause().getClass().equals(ScannerException.class) ||
-						e.getCause().getClass().equals(IOException.class))
-					{
-						while(!t.tokenString().equals(";") && t.hasNext())
-						{
-							t.next();
-						}
-					}
-					else
-						fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
-								+ScannerException.class+"OR"
-								+ IOException.class);
-					
-				} 
-			}
+				method.invoke(p).toString();
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+			
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+							+ScannerException.class+"OR"
+							+ IOException.class);
+			} 
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
 		
 	}
-	
-	
-	
+
 }
