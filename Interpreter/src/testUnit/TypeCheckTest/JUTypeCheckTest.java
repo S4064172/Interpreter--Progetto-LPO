@@ -64,30 +64,35 @@ public class JUTypeCheckTest {
 	public void TestNewAtomCheckTypeRight(String input, String resultExpected)
 	{
 		
-		try(Tokenizer t = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
 			String resultCall=null;
 			
 			try
 			{
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
 				method.setAccessible(true);
-				t.next();
-				Object pp =  method.invoke(p);
-				if (pp instanceof Pair)
-					resultCall=((Pair) pp).accept(new TypeCheck()).toString();
+				tokenizer.next();
+				Object resultInvoke =  method.invoke(parser);
+				if (resultInvoke instanceof Pair)
+					resultCall=((Pair) resultInvoke).accept(new TypeCheck()).toString();
 				else
-					if (pp instanceof Length)
-						resultCall=((Length) pp).accept(new TypeCheck()).toString();
+					if (resultInvoke instanceof Length)
+						resultCall=((Length) resultInvoke).accept(new TypeCheck()).toString();
 					else
-						if (pp instanceof Fst)
-							resultCall=((Fst) pp).accept(new TypeCheck()).toString();
+						if (resultInvoke instanceof Fst)
+							resultCall=((Fst) resultInvoke).accept(new TypeCheck()).toString();
 						else
-							if (pp instanceof Snd)
-								resultCall=((Snd) pp).accept(new TypeCheck()).toString();
+							if (resultInvoke instanceof Snd)
+								resultCall=((Snd) resultInvoke).accept(new TypeCheck()).toString();
 							else
-								fail("error type");
+								fail("error type=>found"+resultInvoke.getClass() + "expected " 
+										+Pair.class+"OR"+
+										Length.class+"OR"+
+										Fst.class+"OR"+
+										Snd.class+"OR"+
+										Pair.class);
 				
 				assertThat(resultCall, is(resultExpected));
 			}catch(IOException e)
@@ -118,31 +123,36 @@ public class JUTypeCheckTest {
 	})
 	public void TestNewAtomCheckTypeWrong_ThrowExecption(String input) 
 	{
-		try(Tokenizer t = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
+		try (Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader( new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
 			
-				StreamParser p = new StreamParser(t);
-				Method method = p.getClass().getDeclaredMethod("parseAtom", null);
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
 				method.setAccessible(true);
-				t.next();
+				tokenizer.next();
 				
 				try
 				{
-					Object pp =  method.invoke(p);
-					if (pp instanceof Pair)
-						((Pair) pp).accept(new TypeCheck());
+					Object resultInvoke =  method.invoke(parser);
+					if (resultInvoke instanceof Pair)
+						((Pair) resultInvoke).accept(new TypeCheck());
 					else
-						if (pp instanceof Length)
-							((Length) pp).accept(new TypeCheck());
+						if (resultInvoke instanceof Length)
+							((Length) resultInvoke).accept(new TypeCheck());
 						else
-							if (pp instanceof Fst)
-								((Fst) pp).accept(new TypeCheck());
+							if (resultInvoke instanceof Fst)
+								((Fst) resultInvoke).accept(new TypeCheck());
 							else
-								if (pp instanceof Snd)
-									((Snd) pp).accept(new TypeCheck());
+								if (resultInvoke instanceof Snd)
+									((Snd) resultInvoke).accept(new TypeCheck());
 								else
-									fail("error type");
-					fail("riconosciuto");
+									fail("error type=>found"+resultInvoke.getClass() + "expected " 
+											+Pair.class+"OR"+
+											Length.class+"OR"+
+											Fst.class+"OR"+
+											Snd.class+"OR"+
+											Pair.class);
+					fail("recognised : "+input);
 				}catch(Exception e )
 				{
 					if( !e.getClass().equals(TypecheckerException.class) &&
