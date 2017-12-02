@@ -3,23 +3,11 @@ package testUnit.TypeCheckTest;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Scanner;
 import static org.hamcrest.CoreMatchers.*;
-import javax.sound.midi.SysexMessage;
-
-import org.hamcrest.core.IsInstanceOf;
-import org.junit.Test;
-import org.junit.experimental.theories.suppliers.TestedOn;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,7 +17,6 @@ import _2_StreamParser.ParserException;
 import _2_StreamParser.StreamParser;
 import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
-import _2_Tokenizer.TokenizerException;
 import _3_Ast.Add;
 import _3_Ast.ConCat;
 import _3_Ast.Div;
@@ -38,7 +25,6 @@ import _3_Ast.IfStmt;
 import _3_Ast.Length;
 import _3_Ast.Mul;
 import _3_Ast.Pair;
-import _3_Ast.Prog;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
 import _3_Ast.WhileStmt;
@@ -446,30 +432,29 @@ public class JUTypeCheckTest {
 		
 	}
 	
-/*	@Test
-	public void TestIfCheckTypeRight()
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"if (3<05){ var x = 5;	print x }else{ print 15}",
+			"if (true){ print 5 }", 
+			"if (5<07){	print  10 }"
+	})
+	public void TestIfCheckTypeRight(String input)
 	{
-		
-		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestIfCheckTypeRight.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			
-			while (t.hasNext()) 
+			try
 			{
-				try
-				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
-					method.setAccessible(true);
-					t.next();
-					IfStmt pp =  (IfStmt)method.invoke(p);
-					pp.accept(new TypeCheck());
-				} catch (Exception e) {
-					if(e.getClass().equals(TypecheckerException.class))
-						fail(e.getMessage());
-					else
-						fail(e.getCause().getMessage());
-				}
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				IfStmt resultInvoke =  (IfStmt)method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+			} catch (Exception e) {
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
 			}
 		}
 		catch (Exception e) {
@@ -477,43 +462,38 @@ public class JUTypeCheckTest {
 		} 
 	}
 
-
-	public void TestIfCheckTypeWrong() 
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"if([5]){print 5}", 
+			"if(50){print 5}",
+			"if(pair(5,5)){print 5}"
+	})
+	public void TestIfCheckTypeWrong_ThrowExecption(String input) 
 	{
 		
-		try(Tokenizer t = new StreamTokenizer(new FileReader("src/testUnit/TypeCheck/TestIfCheckTypeWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			while (t.hasNext()) 
+			try
 			{
-				try
-				{
-					StreamParser p = new StreamParser(t);
-					Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
-					method.setAccessible(true);
-					t.next();
-					IfStmt pp =  (IfStmt)method.invoke(p);
-					pp.accept(new TypeCheck());
-				}catch(Exception e )
-				{
-					if(!e.getClass().equals(TypecheckerException.class))
-						if(	e.getCause().getClass().equals(ParserException.class) ||
-							e.getCause().getClass().equals(ScannerException.class) ||
-							e.getCause().getClass().equals(IOException.class))
-						{
-								while(!t.tokenString().equals(";") && t.hasNext())
-								{
-									t.next();
-								}
-						}
-						else
-								fail(e.getCause().getMessage());
-				}
-				
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				IfStmt resultInvoke =  (IfStmt)method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+			}catch(Exception e )
+			{
+				if( !e.getClass().equals(TypecheckerException.class) &&
+					!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail(e.getCause().getMessage());
 			}
+
 		} catch (Exception e) {
 			fail(e.getMessage());
 		} 
 		
 	}
-	*/
+	
 }
