@@ -18,7 +18,7 @@ public class AllTest {
 		test.JUTokenizerTest_CONV();
 		test.JUTokenizerTest_NUM();
 	}
-	
+/*	
 	@Test
 	public void ParserTest() 
 	{
@@ -67,5 +67,5 @@ public class AllTest {
 		
 		
 	}
-
+*/
 }
