@@ -1,0 +1,7 @@
+//do{}while();
+//do{}while(true);
+//do{print 5}while([5]@[5]);
+var temp = [0];
+var i=1;
+do{temp=temp@[i];print i; i=i+1}while(i<10);
+print temp
