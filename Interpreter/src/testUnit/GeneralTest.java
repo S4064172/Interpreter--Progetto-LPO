@@ -1,21 +1,16 @@
 package testUnit;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
 import _2_StreamParser.StreamParser;
 import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
@@ -87,7 +82,28 @@ class GeneralTest {
 		"print xx;\r\n" + 
 		"print 10-5+587-5422*0;\r\n" + 
 		"print 6+054;\r\n" + 
-		"print 10*5/10','0 5 10 true 2 592 50 5'"
+		"print 10*5/10','0 5 10 true 2 592 50 5'",
+//IfTest
+		"'var rr =[5,6,8,9];\r\n"+ 
+		"var x = 5;\r\n" + 
+		"if (5<05){\r\n" + 
+		"	print x \r\n" + 
+		"}\r\n" + 
+		"else{ \r\n" + 
+		"	print 5 \r\n" + 
+		"};\r\n" + 
+		"if (x < 5) {\r\n" + 
+		"	print x\r\n" + 
+		"};\r\n" + 
+		"if (true) {\r\n" + 
+		"	print rr\r\n" + 
+		"};\r\n" + 
+		"if (x == 5) {\r\n" + 
+		"	print x\r\n" + 
+		"};\r\n" + 
+		"if (01 == 1) {\r\n" + 
+		"	print 8\r\n" + 
+		"}','5 [5, 6, 8, 9] 5 8'"
 		})
 	public void GeneralTestInterpreterRight(String input, String resultExpected)
 	{		
