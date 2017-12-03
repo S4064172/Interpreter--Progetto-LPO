@@ -18,7 +18,7 @@ import _3_Ast.*;
  * 			 'for' ID 'in' Exp '{' StmtSeq '}' |					(V)
  * 			 'if' '('Exp')' '{' StmtSeq '}' ('else' '{'StmtSeq'}')?	(V) 
  * 			 'while' '('Exp')' '{'StmtSeq'}'						(V)
- * 			 'do' '{'StmtSeq'}' 'while' '('Exp')'					(X)
+ * 			 'do' '{'StmtSeq'}' 'while' '('Exp')'					(V)
  * 	ExpSeq ::= Exp (',' ExpSeq)?									(V)			
  * 	Exp ::=  And ('||' And)* 										(V)
  * 	And ::= Eq ('&&' Eq)*											(V)
