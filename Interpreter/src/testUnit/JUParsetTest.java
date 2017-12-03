@@ -398,7 +398,8 @@ public class JUParsetTest {
 		} 
 		
 	}
-	
+/*	
+ * correct in the right branch
 	@ParameterizedTest
 	@ValueSource(strings = {
 			"if(){}",
@@ -417,6 +418,69 @@ public class JUParsetTest {
 			try
 			{
 				method.invoke(p).toString();
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+			
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+							+ScannerException.class+"OR"
+							+ IOException.class);
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+*/	
+
+	@ParameterizedTest()
+	@CsvSource({
+		"'do{print 5}while(true)','DoWhileStmt(BoolLiteral(true),SingleStmt(PrintStmt(IntLiteral(5))))'",
+		"'do{print [5]}while(5<10)','DoWhileStmt(Lth(IntLiteral(5),IntLiteral(10)),SingleStmt(PrintStmt(ListLiteral(SingleExp(IntLiteral(5))))))'"
+		})
+	public void testDoWhileRight(String input, String resultExpected)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				String result= method.invoke(parser).toString();
+				assertThat(result, is(resultExpected));
+			}catch (Exception e) {
+				fail(e.getCause().getMessage());
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"do{}",
+			"do{}while()",
+			"do{}while(true)"
+	})
+	public void testDoWhilefWrong_ThrowExecption(String input)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				method.invoke(parser).toString();
 				fail("recognised -->"+input);
 			}catch (Exception e) 
 			{
