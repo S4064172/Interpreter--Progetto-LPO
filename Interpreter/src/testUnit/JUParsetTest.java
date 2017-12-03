@@ -379,12 +379,12 @@ public class JUParsetTest {
 	})
 	public void testIfRight(String input,String resultExpected)
 	{
-		try(Tokenizer tokenizr = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
-			StreamParser parser = new StreamParser(tokenizr);
+			StreamParser parser = new StreamParser(tokenizer);
 			Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
 			method.setAccessible(true);
-			tokenizr.next();
+			tokenizer.next();
 			try
 			{
 				String resultInvoke= method.invoke(parser).toString();
@@ -407,7 +407,7 @@ public class JUParsetTest {
 	})
 	public void testIfWrong_ThrowExecption(String input)
 	{
-		try(Tokenizer tokenizer = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testIfWrong.txt") ))
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			
 			StreamParser p = new StreamParser(tokenizer);
