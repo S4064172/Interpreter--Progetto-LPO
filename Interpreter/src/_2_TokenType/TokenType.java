@@ -41,6 +41,7 @@ public enum TokenType {
 	WHILE,
 	LENGTH,
 	CONCAT,
-	DIV
+	DIV,
+	DO
 /*******/
 }

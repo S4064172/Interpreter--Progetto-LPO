@@ -58,6 +58,8 @@ public interface Visitor<T> {
 /************/
 	T visitWhileStmt(Exp exp, StmtSeq block);
 	
+	T visitDoWhileStmt(Exp exp, StmtSeq block);
+	
 	T visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock);
 	
 	T visitConCat(Exp left, Exp right);

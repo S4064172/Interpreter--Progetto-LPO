@@ -18,6 +18,7 @@ import _3_Ast.*;
  * 			 'for' ID 'in' Exp '{' StmtSeq '}' |					(V)
  * 			 'if' '('Exp')' '{' StmtSeq '}' ('else' '{'StmtSeq'}')?	(V) 
  * 			 'while' '('Exp')' '{'StmtSeq'}'						(V)
+ * 			 'do' '{'StmtSeq'}' 'while' '('Exp')'					(X)
  * 	ExpSeq ::= Exp (',' ExpSeq)?									(V)			
  * 	Exp ::=  And ('||' And)* 										(V)
  * 	And ::= Eq ('&&' Eq)*											(V)
@@ -93,6 +94,8 @@ public class StreamParser implements Parser {
 			return parseWhileStmt();
 		case IF:
 			return parseIfStmt();
+		case DO:
+			return parseDoWhileStmt();
 /******/
 		}
 	}
@@ -151,6 +154,18 @@ public class StreamParser implements Parser {
 		}
 		return new IfStmt(exp, ifStmts,esleStmts);
 	}
+	
+	private DoWhileStmt parseDoWhileStmt() throws IOException, ScannerException, ParserException 
+	{
+		consume(DO);
+		consume(START_BLOCK);
+		StmtSeq doWhileStmts = parseStmtSeq();
+		consume(END_BLOCK);
+		consume(WHILE);
+		Exp exp = parseExp();
+		return new DoWhileStmt(exp, doWhileStmts);
+	}
+	
 /**********/
 	private Exp parseExp() throws IOException, ScannerException, ParserException {
 		Exp exp = parseAnd();
