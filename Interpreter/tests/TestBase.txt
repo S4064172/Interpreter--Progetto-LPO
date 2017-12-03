@@ -1,0 +1,24 @@
+var x = 3;
+var l = [1,2,3];
+var s = [0,0,0,0];
+print x;
+var rr = 24;
+rr = -42;
+var e = [4,5];
+
+var asd = 3+(5*(9+3));
+print asd;
+
+x = (top l) + 5;
+//print l;
+e = pop l;
+s = push(rr, e);
+print rr; 
+for i in l {
+	print i; 
+	rr = 25
+};
+for l in l{
+	print l;
+	print l
+}

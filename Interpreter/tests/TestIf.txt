@@ -1,0 +1,25 @@
+//if ([5]) { print x } else { print 5};
+//if (5) { print x };
+//var errX = 5;
+//if (errX=5) { print x };
+//if (errX) { print x };
+var rr =[5,6]@[8,9];
+var x = 5;
+if (5<05){
+	print x 
+}
+else{ 
+	print 5
+};
+if (x < 5) {
+	print x
+};
+if (true) {
+	print rr
+};
+if (x == 5) {
+	print x
+};
+if (01 == 1) {
+	print 8
+}

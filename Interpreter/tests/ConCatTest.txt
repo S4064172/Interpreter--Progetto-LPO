@@ -1,0 +1,12 @@
+//var varConcat = 5 @ 5; 
+//var varConcat = [5] @ 5; 
+//var varConcat = 5 @ [5];	
+//var varConcat = [true] @ [5];
+//var varConcat = [5] @ [true];
+//[5] @ [5]; 
+
+var varConcat = [5] @ [5];
+print varConcat;
+print [5] @ [6];
+print [7,9,8,7,8,9]@[4,5,6,5,4,5,5,6,04,04,05,06,04,07,01111]@[10];
+print length ([5]@[6])

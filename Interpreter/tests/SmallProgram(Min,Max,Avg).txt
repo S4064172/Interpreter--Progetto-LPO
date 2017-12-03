@@ -1,0 +1,36 @@
+//Trova il massimo
+//Trova il minimo
+//Calcola la media
+var list = [1,2,3,4,5,6,7,8,9];
+var list2 = [01,02,03,04,05,06,07,010,011,012];
+var list3 = [-1,-2,-3,-4,-5,-6,-7,-8,-9];
+var list4 = [-01,-02,-03,-04,-05,-06,-07,-010,-011,-012];
+list=list@list2@list3@list4;
+var index = length list;
+var max = top list;
+list = pop list;
+var min = max;
+var avg = max;
+var temp = 0;
+while (0 < length list)
+{
+	temp = top list;
+	list = pop list;
+	if (temp < max )
+	{
+		if( !(min < temp))
+		{
+			min=temp
+		}
+	}
+	else
+	{
+		max=temp
+	};
+	avg=avg+temp
+
+};
+
+print max;
+print min;
+print avg/index

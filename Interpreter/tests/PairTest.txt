@@ -1,0 +1,48 @@
+//var ErrF = fst 5 ;
+//var ErrG = fst [5,5];
+//var ErrH = fst ([5,5]);
+
+//var ErrF = snd 5 ;
+//var ErrG = snd [5,5];
+//var ErrH = snd ([5,5]);
+
+//print pair 3,[5];
+//pair (pair(5,5),5);
+
+
+var pair1 = pair([5],[5]);
+print pair1;
+var fst1 = fst pair1;
+print fst1;
+var snd1 = snd pair1;
+print snd1;
+
+var pair2 = pair(01,2);
+print pair2;
+var fst2 = fst pair2;
+print fst2;
+var snd2 = snd pair2;
+print snd2;
+
+var pair3 = pair(true,false);
+print pair3;
+var fst3 = fst pair3;
+print fst3;
+var snd3 = snd pair3;
+print snd3;
+
+var pair4 = pair(pair(5,5),pair([3],[5]));
+print pair4;
+print fst pair4;
+print snd pair4;
+
+var pair5 = pair (3,[5]);
+print pair5;
+
+var pair6 = pair (pair(05,5),5);
+print pair6;
+
+var pair7 = pair (pair(3,(true&&!false)&&(5<10)),pair([5]@[5,8,6,87,4,5,6,2,1,4,05,04,07745],true));
+print pair7;
+
+print pair(5,5)==pair(5,5)
