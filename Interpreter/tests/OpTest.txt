@@ -1,0 +1,23 @@
+//var errA = [5] / [5]; 
+//var errA = [5] / [true]; 
+//var errA = 5 / [true]; 
+//var errA = [true] / 5; 
+//var errA = 5 / 0;
+//var errA = [5] - [5]; 
+//var errA = [5] - [true]; 
+//var errA = 5 - [true];
+//var errA = [true] - 5; 
+
+
+
+var x= 045;
+x = 552626/445425622;
+print x;
+print 10/2;
+print 10+5/5-1;
+print 10+5/5-1==10;
+var xx = 7 - 5;
+print xx;
+print 10-5+587-5422*0;
+print 6+054;
+print 10*5/10

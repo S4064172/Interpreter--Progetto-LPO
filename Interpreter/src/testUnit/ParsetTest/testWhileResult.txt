@@ -1,3 +1,0 @@
-WhileStmt(Lth(SimpleIdent(i),IntLiteral(10)),MoreStmt(PrintStmt(SimpleIdent(i)),SingleStmt(VarStmt(SimpleIdent(qwe),Add(IntLiteral(3),SimpleIdent(i))))))
-WhileStmt(BoolLiteral(true),SingleStmt(PrintStmt(IntLiteral(5))))
-WhileStmt(ListLiteral(SingleExp(IntLiteral(5))),SingleStmt(PrintStmt(IntLiteral(5))))

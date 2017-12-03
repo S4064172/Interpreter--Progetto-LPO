@@ -1,3 +1,0 @@
-while([5]){print 5};
-while(50){print 5};
-while(pair(5,5)){print 5}

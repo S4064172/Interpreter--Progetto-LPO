@@ -1,2 +1,0 @@
-while (5<10){print 5 };
-while (true){print true}
