@@ -165,6 +165,24 @@ public class Eval implements Visitor<Value> {
 	}
 	
 	@Override
+	public Value visitSwitchStmt(Exp exp, HashMap<Integer, List<CaseStmt>> block) {
+		Integer key = exp.accept(this).asInt();
+		if(block.containsKey(key))
+		{
+			block.get(key).get(0).accept(this);
+		}
+		return null;
+	}
+
+	@Override
+	public Value visitCaseStmt(IntLiteral key, StmtSeq block) {
+		env.enterScope();
+		block.accept(this);
+		env.exitScope();
+		return null;
+	}
+	
+	@Override
 	public Value visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
 		if(exp.accept(this).asBool()){
 			env.enterScope();
@@ -180,6 +198,7 @@ public class Eval implements Visitor<Value> {
 		}
 		return null;
 	}
+	
 	@Override
 	public Value visitConCat(Exp left, Exp right) {
 		ListValue result = new LinkedListValue(left.accept(this).asList());
@@ -226,18 +245,6 @@ public class Eval implements Visitor<Value> {
 		return exp.accept(this).asPair().second();
 	}
 
-	@Override
-	public Value visitSwitchStmt(Exp exp, HashMap<Integer, List<CaseStmt>> block) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Value visitCaseStmt(IntLiteral key, StmtSeq block) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
 /************/
 }
