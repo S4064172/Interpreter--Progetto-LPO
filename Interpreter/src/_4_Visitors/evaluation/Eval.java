@@ -1,8 +1,12 @@
 package _4_Visitors.evaluation;
 
+import java.util.HashMap;
+import java.util.List;
+import _3_Ast.CaseStmt;
 import _3_Ast.Exp;
 import _3_Ast.ExpSeq;
 import _3_Ast.Ident;
+import _3_Ast.IntLiteral;
 import _3_Ast.SimpleIdent;
 import _3_Ast.Stmt;
 import _3_Ast.StmtSeq;
@@ -220,6 +224,18 @@ public class Eval implements Visitor<Value> {
 	@Override
 	public Value visitSnd(Exp exp) {
 		return exp.accept(this).asPair().second();
+	}
+
+	@Override
+	public Value visitSwitchStmt(Exp exp, HashMap<Integer, List<CaseStmt>> block) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Value visitCaseStmt(IntLiteral key, StmtSeq block) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

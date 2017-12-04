@@ -6,17 +6,17 @@ import _4_Visitors.Visitor;
 
 public class CaseStmt implements Stmt {
 
-	private final IntLiteral exp;
+	private final IntLiteral key;
 	private final StmtSeq block;
 	
-	public CaseStmt(IntLiteral exp, StmtSeq block) {
-		this.exp = requireNonNull(exp);
+	public CaseStmt(IntLiteral key, StmtSeq block) {
+		this.key = requireNonNull(key);
 		this.block = requireNonNull(block);
 	}
 
 
 	public IntLiteral getExp() {
-		return exp;
+		return key;
 	}
 
 	public StmtSeq getBlock() {
@@ -25,12 +25,12 @@ public class CaseStmt implements Stmt {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + exp + "," + block + ")";
+		return getClass().getSimpleName() + "(" + key + "," + block + ")";
 	}
 	
 	@Override
 	public <T> T accept(Visitor<T> visitor) {
-		return null;
+		return visitor.visitCaseStmt(key, block);
 	}
 
 }

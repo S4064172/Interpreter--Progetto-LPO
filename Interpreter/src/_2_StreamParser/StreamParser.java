@@ -154,7 +154,6 @@ public class StreamParser implements Parser {
 			consume(CASE);
 			IntLiteral num = parseNum();
 			consume(START_BLOCK);
-			System.err.println("-->"+num);
 			if(!temp.containsKey(num.getValue()))
 			{
 				LinkedList<CaseStmt> caseStmtList = new LinkedList<>();
