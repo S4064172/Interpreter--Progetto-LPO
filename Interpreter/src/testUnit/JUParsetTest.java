@@ -407,7 +407,7 @@ public class JUParsetTest {
 	})
 	public void testIfWrong_ThrowExecption(String input)
 	{
-		try(Tokenizer tokenizer = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testIfWrong.txt") ))
+		/*try(Tokenizer tokenizer = new StreamTokenizer(new FileReader("src/testUnit/ParsetTest/testIfWrong.txt") ))
 		{
 			
 			StreamParser p = new StreamParser(tokenizer);
@@ -432,7 +432,76 @@ public class JUParsetTest {
 		catch (Exception e) {
 			fail(e.getMessage());
 		} 
+		*/
+	}
+	
+	
+	@ParameterizedTest()
+	@CsvSource({
+		"'switch(1){case 1{print 5 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(IntLiteral(2),SingleStmt(PrintStmt(IntLiteral(6)))))'",
+		"'switch(1){case 1{print 5 break}case 1{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(6)))))'"
+	})
+	public void testSwitchRight(String input,String resultExpected)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				String resultInvoke= method.invoke(parser).toString();
+				assertThat(resultInvoke, is(resultExpected));
+			}catch (Exception e) {
+				e.printStackTrace();
+				fail(e.getCause().getMessage());
+			} 
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} 
+		
 		
 	}
 
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"switch(){}",
+			"switch(1){}",
+			"switch(1){case [5]{}}",
+			"switch(1){case 1 {print 5}}",
+			"switch(1){case 1 print 5}"
+	})
+	public void testSwitchWrong_ThrowExecption(String input)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser p = new StreamParser(tokenizer);
+			Method method = p.getClass().getDeclaredMethod("parseSwitchStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				method.invoke(p).toString();
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+			
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class) &&
+					!e.getCause().getClass().equals(IllegalStateException.class))
+							fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR " 
+							+ScannerException.class+" OR"
+							+ IOException.class+ " OR "+IllegalStateException.class);	
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
 }
