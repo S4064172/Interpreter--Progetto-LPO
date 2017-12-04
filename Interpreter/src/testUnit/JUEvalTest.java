@@ -39,6 +39,7 @@ import _3_Ast.Prog;
 import _3_Ast.ProgClass;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
+import _3_Ast.SwitchStmt;
 import _3_Ast.WhileStmt;
 import _4_Visitors.evaluation.Eval;
 import _4_Visitors.typechecking.TypeCheck;
@@ -305,6 +306,47 @@ public class JUEvalTest {
 				assertThat(resultString, is(resultExpected));
 			}catch(Exception e)
 			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+	}
+	
+	@ParameterizedTest
+	@CsvSource
+	({
+		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','5'",
+		"'switch(10){case 1{print 5 break}case 2{print 6 break}}',''",
+		"'switch(-10){case 1{print 5 break}case 2{print 6 break}case -10{print 6 break}}','6'"
+	})
+	public void TestSwitchEvalRight(String input, String resultExpected)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
+		{
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				SwitchStmt resultInvoke =(SwitchStmt) method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				String resultString = resultCall.toString().replace("\r\n", " ");
+				resultString = resultString.substring(0, resultString.length()-1);
+				assertThat(resultString, is(resultExpected));
+			}catch(Exception e)
+			{
+				e.printStackTrace();
 				if(e.getClass().equals(TypecheckerException.class))
 					fail(e.getMessage());
 				else
