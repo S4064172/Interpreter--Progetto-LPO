@@ -12,6 +12,7 @@ import _3_Ast.Stmt;
 import _3_Ast.StmtSeq;
 import _3_Environment.GenEnvironment;
 import _4_Visitors.Visitor;
+import _4_Visitors.typechecking.TypecheckerException;
 
 public class Eval implements Visitor<Value> {
 
@@ -167,10 +168,20 @@ public class Eval implements Visitor<Value> {
 	@Override
 	public Value visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block) {
 		Integer key = exp.accept(this).asInt();
-		if(block.containsKey(key))
-		{
-			block.get(key).get(0).accept(this);
+		int countKey=0;
+		CaseStmt caseKey=null;
+		for (Exp iterable_element : block.keySet()) {
+			Integer tempKey = iterable_element.accept(this).asInt();
+			if(key.equals(tempKey))
+			{
+				countKey++;
+				caseKey = block.get(iterable_element).get(0);
+			}
 		}
+		if(countKey>1)
+			throw new EvaluatorException("Duplicate key Case");
+		if(caseKey!=null)
+			caseKey.accept(this);
 		return null;
 	}
 
