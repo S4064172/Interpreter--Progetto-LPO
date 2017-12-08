@@ -165,7 +165,7 @@ public class Eval implements Visitor<Value> {
 	}
 	
 	@Override
-	public Value visitSwitchStmt(Exp exp, HashMap<Integer, List<CaseStmt>> block) {
+	public Value visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block) {
 		Integer key = exp.accept(this).asInt();
 		if(block.containsKey(key))
 		{
@@ -175,7 +175,7 @@ public class Eval implements Visitor<Value> {
 	}
 
 	@Override
-	public Value visitCaseStmt(IntLiteral key, StmtSeq block) {
+	public Value visitCaseStmt(Exp key, StmtSeq block) {
 		env.enterScope();
 		block.accept(this);
 		env.exitScope();

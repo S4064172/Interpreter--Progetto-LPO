@@ -45,7 +45,7 @@ public class SwitchStmt implements Stmt {
 	
 	@Override
 	public <T> T accept(Visitor<T> visitor) {
-		return null;//visitor.visitSwitchStmt(exp, block);
+		return visitor.visitSwitchStmt(exp, block);
 	}
 
 }

@@ -30,7 +30,7 @@ public class CaseStmt implements Stmt {
 	
 	@Override
 	public <T> T accept(Visitor<T> visitor) {
-		return null;//visitor.visitCaseStmt(key, block);
+		return visitor.visitCaseStmt(key, block);
 	}
 
 }

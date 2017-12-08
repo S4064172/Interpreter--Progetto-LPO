@@ -324,6 +324,7 @@ public class JUEvalTest {
 		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','5'",
 		"'switch(10){case 1{print 5 break}case 2{print 6 break}}',''"
 		//"'switch(-10){case 1{print 5 break}case 2{print 6 break}case -10{print 6 break}}','6'"
+		
 	})
 	public void TestSwitchEvalRight(String input, String resultExpected)
 	{		
@@ -359,4 +360,43 @@ public class JUEvalTest {
 		} 
 		System.setOut(System.out);
 	}
+	
+	
+	@ParameterizedTest
+	@CsvSource
+	({ 
+//		"'switch(1+5){case 5+1{print 5}case 1+5{print 5}}',''"
+	})
+	public void TestSwitchEvalWrong_ThrowsExeption(String input)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
+		{
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				SwitchStmt resultInvoke =(SwitchStmt) method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				fail("recognised ->"+input);
+			}catch(Exception e)
+			{
+				if( !e.getClass().equals(TypecheckerException.class) &&
+						!e.getCause().getClass().equals(ParserException.class) &&
+						!e.getCause().getClass().equals(ScannerException.class) &&
+						!e.getCause().getClass().equals(IOException.class))
+								fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+	}
+	
 }

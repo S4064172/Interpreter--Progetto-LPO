@@ -179,9 +179,9 @@ public class TypeCheck implements Visitor<Type> {
 	}
 	
 	@Override
-	public Type visitSwitchStmt(Exp exp, HashMap<Integer, List<CaseStmt>> block) {
+	public Type visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block) {
 		exp.accept(this).checkEqual(INT);
-		for (Integer iterable_element : block.keySet()) {
+		for (Exp iterable_element : block.keySet()) {
 			if( block.get(iterable_element).size() > 1)
 				throw new TypecheckerException("Duplicate key Case");
 			block.get(iterable_element).get(0).accept(this);
@@ -190,7 +190,7 @@ public class TypeCheck implements Visitor<Type> {
 	}
 
 	@Override
-	public Type visitCaseStmt(IntLiteral key, StmtSeq block) {
+	public Type visitCaseStmt(Exp key, StmtSeq block) {
 		key.accept(this).checkEqual(INT);
 		env.enterScope();
 		block.accept(this);

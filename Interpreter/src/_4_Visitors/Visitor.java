@@ -64,9 +64,9 @@ public interface Visitor<T> {
 	
 	T visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock);
 	
-	T visitSwitchStmt(Exp exp, HashMap<Integer, List<CaseStmt>> block);
+	T visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block);
 	
-	T visitCaseStmt(IntLiteral key, StmtSeq block);
+	T visitCaseStmt(Exp key, StmtSeq block);
 	
 	T visitConCat(Exp left, Exp right);
 	
