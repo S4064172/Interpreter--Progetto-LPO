@@ -42,6 +42,7 @@ import _3_Ast.Sub;
 import _3_Ast.SwitchStmt;
 import _3_Ast.WhileStmt;
 import _4_Visitors.evaluation.Eval;
+import _4_Visitors.evaluation.EvaluatorException;
 import _4_Visitors.typechecking.TypeCheck;
 import _4_Visitors.typechecking.TypecheckerException;
 
@@ -322,8 +323,9 @@ public class JUEvalTest {
 	@CsvSource
 	({
 		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','5'",
-		"'switch(10){case 1{print 5 break}case 2{print 6 break}}',''"
-		//"'switch(-10){case 1{print 5 break}case 2{print 6 break}case -10{print 6 break}}','6'"
+		"'switch(10){case 1{print 5 break}case 2{print 6 break}}',''",
+		"'switch(-10){case 1{print 5 break}case 2{print 7 break}case -10{print 6 break}}','6'",
+		"switch(1+5){case 5+1{print 5 break}case 2+5{print 5 break}},'5'"
 		
 	})
 	public void TestSwitchEvalRight(String input, String resultExpected)
@@ -361,11 +363,10 @@ public class JUEvalTest {
 		System.setOut(System.out);
 	}
 	
-	
 	@ParameterizedTest
 	@CsvSource
 	({ 
-//		"'switch(1+5){case 5+1{print 5}case 1+5{print 5}}',''"
+		"'switch(1+5){case 5+1{print 5 break}case 1+5{print 5 break}}'"
 	})
 	public void TestSwitchEvalWrong_ThrowsExeption(String input)
 	{		
@@ -387,6 +388,7 @@ public class JUEvalTest {
 			}catch(Exception e)
 			{
 				if( !e.getClass().equals(TypecheckerException.class) &&
+						!e.getClass().equals(EvaluatorException.class) &&
 						!e.getCause().getClass().equals(ParserException.class) &&
 						!e.getCause().getClass().equals(ScannerException.class) &&
 						!e.getCause().getClass().equals(IOException.class))
