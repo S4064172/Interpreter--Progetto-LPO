@@ -439,8 +439,12 @@ public class JUParsetTest {
 	@ParameterizedTest()
 	@CsvSource({
 		"'switch(1){case 1{print 5 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5)))))'",
-		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(IntLiteral(2),SingleStmt(PrintStmt(IntLiteral(6)))))'",
-		"'switch(1){case 1{print 5 break}case 1{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(6)))))'"
+		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(2),SingleStmt(PrintStmt(IntLiteral(6))))CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1){case 1{print 5 break}case 1{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(6))))CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1){case [5]{print 5 break}}','SwitchStmt(IntLiteral(1),CaseStmt(ListLiteral(SingleExp(IntLiteral(5))),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch([5]){case [5]{print 5 break}}','SwitchStmt(ListLiteral(SingleExp(IntLiteral(5))),CaseStmt(ListLiteral(SingleExp(IntLiteral(5))),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1+5){case 5+1{print 5 break}case 5+1{print 5 break}}','SwitchStmt(Add(IntLiteral(1),IntLiteral(5)),CaseStmt(Add(IntLiteral(5),IntLiteral(1)),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(Add(IntLiteral(5),IntLiteral(1)),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1+5){case 5+1{print 5 break}case 1+5{print 5 break}}','SwitchStmt(Add(IntLiteral(1),IntLiteral(5)),CaseStmt(Add(IntLiteral(5),IntLiteral(1)),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(Add(IntLiteral(1),IntLiteral(5)),SingleStmt(PrintStmt(IntLiteral(5)))))'"
 	})
 	public void testSwitchRight(String input,String resultExpected)
 	{
