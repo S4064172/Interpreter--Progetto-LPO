@@ -500,7 +500,8 @@ public class JUTypeCheckTest {
 	@ParameterizedTest()
 	@CsvSource({
 		"switch(1){case 1{print 5 break}}",
-		"switch(1){case 1{print 5 break}case 2{print 6 break}}"
+		"switch(1){case 1{print 5 break}case 2{print 6 break}}",
+		"switch(1+5){case 5+1{print 5 break}case 1+5{print 5 break}}"
 	})
 	public void TestSwitchCheckTypeRight(String input)
 	{
@@ -529,7 +530,9 @@ public class JUTypeCheckTest {
 	@ParameterizedTest
 	@ValueSource(strings = {
 			"switch(1){case 1{print 5 break}case 1{print 6 break}}",
-			"switch([1]){case 1{print 5 break}}"
+			"switch([1]){case 1{print 5 break}}",
+			"switch(1){case [5]{print 5 break}",
+			"switch(1+5){case 5+1{print 5 break}case 5+1{print 5 break}}",
 	})
 	public void TestSwitchCheckTypeWrong_ThrowExecption(String input) 
 	{
