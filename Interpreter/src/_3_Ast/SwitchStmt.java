@@ -12,9 +12,9 @@ import _4_Visitors.Visitor;
 public class SwitchStmt implements Stmt {
 
 	private final Exp exp;
-	private final HashMap<Integer, List<CaseStmt>> block;
+	private final HashMap<Exp, List<CaseStmt>> block;
 	
-	public SwitchStmt(Exp exp, HashMap<Integer,List<CaseStmt>> block) throws ScannerException {
+	public SwitchStmt(Exp exp, HashMap<Exp,List<CaseStmt>> block) throws ScannerException {
 		this.exp = requireNonNull(exp);
 		requireNonNull(block);
 		if(block.size()==0)
@@ -27,7 +27,7 @@ public class SwitchStmt implements Stmt {
 		return exp;
 	}
 
-	public HashMap<Integer, List<CaseStmt>> getBlock() {
+	public HashMap<Exp, List<CaseStmt>> getBlock() {
 		return block;
 	}
 
@@ -35,7 +35,7 @@ public class SwitchStmt implements Stmt {
 	public String toString() {
 		String result="";
 		
-		for (Integer iterable_element : block.keySet()) {
+		for (Exp iterable_element : block.keySet()) {
 			for (CaseStmt signleCase : block.get(iterable_element)) {
 				result+=signleCase.toString();	
 			}		
@@ -45,7 +45,7 @@ public class SwitchStmt implements Stmt {
 	
 	@Override
 	public <T> T accept(Visitor<T> visitor) {
-		return visitor.visitSwitchStmt(exp, block);
+		return null;//visitor.visitSwitchStmt(exp, block);
 	}
 
 }

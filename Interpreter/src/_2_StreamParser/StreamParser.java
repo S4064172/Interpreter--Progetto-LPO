@@ -148,18 +148,18 @@ public class StreamParser implements Parser {
 		consume(SWITCH);
 		Exp exp = parseExp();
 		consume(START_BLOCK);
-		HashMap<Integer, List<CaseStmt>> temp = new HashMap<>();
+		HashMap<Exp, List<CaseStmt>> temp = new HashMap<>();
 		while(tokenizer.tokenType()!=END_BLOCK)
 		{
 			consume(CASE);
-			IntLiteral num = parseNum();
+			Exp condition = parseExp();
 			consume(START_BLOCK);
-			if(!temp.containsKey(num.getValue()))
+			if(!temp.containsKey(condition))
 			{
 				LinkedList<CaseStmt> caseStmtList = new LinkedList<>();
-				temp.put(num.getValue(), caseStmtList);
+				temp.put(condition, caseStmtList);
 			}
-			temp.get(num.getValue()).add(new CaseStmt(num, parseStmtSeq()));
+			temp.get(condition).add(new CaseStmt(condition, parseStmtSeq()));
 			consume(BREAK);
 			consume(END_BLOCK);
 		}
