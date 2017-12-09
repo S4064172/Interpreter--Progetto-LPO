@@ -3,6 +3,9 @@ package _2_StreamParser;
 import static _2_TokenType.TokenType.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import _1_StreamScanner.ScannerException;
 import _2_TokenType.TokenType;
@@ -18,6 +21,10 @@ import _3_Ast.*;
  * 			 'for' ID 'in' Exp '{' StmtSeq '}' |					(V)
  * 			 'if' '('Exp')' '{' StmtSeq '}' ('else' '{'StmtSeq'}')?	(V) 
  * 			 'while' '('Exp')' '{'StmtSeq'}'						(V)
+ * 			 'switch' 'exp' '{' 'case' '(' 'NUM'' )' 
+ * 							'{''StmtSeq''break''}' 
+ * 							('case' '(' 'NUM' ')' 
+ * 							'{''StmtSeq''break''}')* '}'			(X)
  * 	ExpSeq ::= Exp (',' ExpSeq)?									(V)			
  * 	Exp ::=  And ('||' And)* 										(V)
  * 	And ::= Eq ('&&' Eq)*											(V)
@@ -93,6 +100,8 @@ public class StreamParser implements Parser {
 			return parseWhileStmt();
 		case IF:
 			return parseIfStmt();
+		case SWITCH:
+			return parseSwitchStmt();
 /******/
 		}
 	}
@@ -133,6 +142,29 @@ public class StreamParser implements Parser {
 		StmtSeq stmts = parseStmtSeq();
 		consume(END_BLOCK);
 		return new WhileStmt(exp, stmts);
+	}
+	
+	private SwitchStmt parseSwitchStmt() throws IOException, ScannerException, ParserException {
+		consume(SWITCH);
+		Exp exp = parseExp();
+		consume(START_BLOCK);
+		HashMap<Exp, List<CaseStmt>> temp = new HashMap<>();
+		while(tokenizer.tokenType()!=END_BLOCK)
+		{
+			consume(CASE);
+			Exp condition = parseExp();
+			consume(START_BLOCK);
+			if(!temp.containsKey(condition))
+			{
+				LinkedList<CaseStmt> caseStmtList = new LinkedList<>();
+				temp.put(condition, caseStmtList);
+			}
+			temp.get(condition).add(new CaseStmt(condition, parseStmtSeq()));
+			consume(BREAK);
+			consume(END_BLOCK);
+		}
+		consume(END_BLOCK);
+		return new SwitchStmt(exp, temp);
 	}
 	
 	private IfStmt parseIfStmt() throws IOException, ScannerException, ParserException {

@@ -41,6 +41,9 @@ public enum TokenType {
 	WHILE,
 	LENGTH,
 	CONCAT,
-	DIV
+	DIV,
+	SWITCH,
+	CASE,
+	BREAK
 /*******/
 }

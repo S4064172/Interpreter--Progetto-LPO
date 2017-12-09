@@ -1,13 +1,18 @@
 package _4_Visitors.evaluation;
 
+import java.util.HashMap;
+import java.util.List;
+import _3_Ast.CaseStmt;
 import _3_Ast.Exp;
 import _3_Ast.ExpSeq;
 import _3_Ast.Ident;
+import _3_Ast.IntLiteral;
 import _3_Ast.SimpleIdent;
 import _3_Ast.Stmt;
 import _3_Ast.StmtSeq;
 import _3_Environment.GenEnvironment;
 import _4_Visitors.Visitor;
+import _4_Visitors.typechecking.TypecheckerException;
 
 public class Eval implements Visitor<Value> {
 
@@ -161,6 +166,34 @@ public class Eval implements Visitor<Value> {
 	}
 	
 	@Override
+	public Value visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block) {
+		Integer key = exp.accept(this).asInt();
+		int countKey=0;
+		CaseStmt caseKey=null;
+		for (Exp iterable_element : block.keySet()) {
+			Integer tempKey = iterable_element.accept(this).asInt();
+			if(key.equals(tempKey))
+			{
+				countKey++;
+				caseKey = block.get(iterable_element).get(0);
+			}
+		}
+		if(countKey>1)
+			throw new EvaluatorException("Duplicate key Case");
+		if(caseKey!=null)
+			caseKey.accept(this);
+		return null;
+	}
+
+	@Override
+	public Value visitCaseStmt(Exp key, StmtSeq block) {
+		env.enterScope();
+		block.accept(this);
+		env.exitScope();
+		return null;
+	}
+	
+	@Override
 	public Value visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
 		if(exp.accept(this).asBool()){
 			env.enterScope();
@@ -176,6 +209,7 @@ public class Eval implements Visitor<Value> {
 		}
 		return null;
 	}
+	
 	@Override
 	public Value visitConCat(Exp left, Exp right) {
 		ListValue result = new LinkedListValue(left.accept(this).asList());
@@ -221,7 +255,7 @@ public class Eval implements Visitor<Value> {
 	public Value visitSnd(Exp exp) {
 		return exp.accept(this).asPair().second();
 	}
-	
-	
+
+
 /************/
 }

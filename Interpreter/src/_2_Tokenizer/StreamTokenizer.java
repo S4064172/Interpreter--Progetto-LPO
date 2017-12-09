@@ -62,6 +62,9 @@ public class StreamTokenizer implements Tokenizer {
 		keywords.put("snd", SND);
 		keywords.put("while", WHILE);
 		keywords.put("length", LENGTH);
+		keywords.put("switch", SWITCH);
+		keywords.put("case", CASE);
+		keywords.put("break", BREAK);
 /********/
 	}
 
@@ -152,7 +155,7 @@ public class StreamTokenizer implements Tokenizer {
 
 	private void checkValidToken(TokenType ttype) {
 		if (tokenType != ttype)
-			throw new IllegalStateException();
+			throw new IllegalStateException("founded "+tokenType+" expected "+ttype);
 	}
 
 	@Override
