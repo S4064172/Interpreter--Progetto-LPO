@@ -193,6 +193,17 @@ public class Eval implements Visitor<Value> {
 		return null;
 	}
 	
+	@Override	
+	public Value visitDoWhileStmt(Exp exp, StmtSeq block) {
+		do 
+		{
+			env.enterScope();
+			block.accept(this);
+			env.exitScope();
+		}while(exp.accept(this).asBool());
+		return null;
+	}
+	
 	@Override
 	public Value visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
 		if(exp.accept(this).asBool()){

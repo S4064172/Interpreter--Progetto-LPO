@@ -198,6 +198,15 @@ public class TypeCheck implements Visitor<Type> {
 		return null;
 	}
 	
+
+	public Type visitDoWhileStmt(Exp exp, StmtSeq block) {
+		exp.accept(this).checkEqual(BOOL);
+		env.enterScope();
+		block.accept(this);
+		env.exitScope();
+		return null;
+	}
+
 	
 	@Override
 	public Type visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
@@ -252,8 +261,7 @@ public class TypeCheck implements Visitor<Type> {
 	@Override
 	public Type visitSnd(Exp exp) {
 		return ((PairType) exp.accept(this).checkPair()).getElTypeSecond();
-	}
-	
+	}	
 /************/
 
 }

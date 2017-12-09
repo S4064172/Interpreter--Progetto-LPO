@@ -142,7 +142,7 @@ public class JUEvalTest {
 				else
 					fail(e.getCause().getMessage());
 			}
-
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
@@ -401,4 +401,41 @@ public class JUEvalTest {
 		System.setOut(System.out);
 	}
 	
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'var i = 0;do{print i ; var qwe = 3 + i; print qwe; i=i+1}while(i<10)',"+
+				"'0 3 1 4 2 5 3 6 4 7 5 8 6 9 7 10 8 11 9 12'"
+	})
+	public void TestDoWhileEvalRight(String input, String resultExpected)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
+		{
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseProg", null);
+				Prog resultInvoke =(Prog)  method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				String resultString = resultCall.toString().replace("\r\n", " ");
+				resultString = resultString.substring(0, resultString.length()-1);
+				assertThat(resultString, is(resultExpected));
+			}catch(Exception e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+	}
+
 }

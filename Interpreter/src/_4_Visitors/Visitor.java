@@ -62,6 +62,8 @@ public interface Visitor<T> {
 /************/
 	T visitWhileStmt(Exp exp, StmtSeq block);
 	
+	T visitDoWhileStmt(Exp exp, StmtSeq block);
+	
 	T visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock);
 	
 	T visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block);

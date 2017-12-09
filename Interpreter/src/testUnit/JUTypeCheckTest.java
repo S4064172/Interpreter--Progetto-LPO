@@ -20,6 +20,7 @@ import _2_Tokenizer.Tokenizer;
 import _3_Ast.Add;
 import _3_Ast.ConCat;
 import _3_Ast.Div;
+import _3_Ast.DoWhileStmt;
 import _3_Ast.Fst;
 import _3_Ast.IfStmt;
 import _3_Ast.Length;
@@ -497,6 +498,7 @@ public class JUTypeCheckTest {
 		
 	}
 	
+
 	@ParameterizedTest()
 	@CsvSource({
 		"switch(1){case 1{print 5 break}}",
@@ -555,11 +557,77 @@ public class JUTypeCheckTest {
 					!e.getCause().getClass().equals(IOException.class))
 							fail(e.getCause().getMessage());
 			}
-
 		} catch (Exception e) {
 			fail(e.getMessage());
 		} 
 		
 	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"do{print 5}while(true)",
+			"do{print 5}while(5<10)"
+	})
+	public void TestDoWhileCheckTypeRight(String input)
+	{
+		
+		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				DoWhileStmt resultInvoke =  (DoWhileStmt)method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+			} catch (Exception e) {
+				e.printStackTrace();
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} 
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"do{print 5}while([5])", 
+			"do{print 5}while(length [5,2])",
+			"do{print 5}while(pair(5,2))"
+	})
+	public void TestDoWhileCheckTypeWrong_ThrowExecption(String input) 
+	{
+		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				DoWhileStmt resultInvoke =  (DoWhileStmt)method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+			}catch(Exception e )
+			{
+				if( !e.getClass().equals(TypecheckerException.class) &&
+					!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail(e.getCause().getMessage());
+			}
+		} catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+		
 	
 }

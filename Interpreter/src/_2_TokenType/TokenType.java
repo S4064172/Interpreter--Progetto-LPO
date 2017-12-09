@@ -44,6 +44,7 @@ public enum TokenType {
 	DIV,
 	SWITCH,
 	CASE,
-	BREAK
+	BREAK,
+	DO
 /*******/
 }

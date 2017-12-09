@@ -61,6 +61,7 @@ public class StreamTokenizer implements Tokenizer {
 		keywords.put("fst", FST);
 		keywords.put("snd", SND);
 		keywords.put("while", WHILE);
+		keywords.put("do", DO);
 		keywords.put("length", LENGTH);
 		keywords.put("switch", SWITCH);
 		keywords.put("case", CASE);
