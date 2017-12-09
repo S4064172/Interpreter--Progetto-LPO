@@ -1,0 +1,5 @@
+package testUnit;
+
+class RunAllTests {
+
+}
