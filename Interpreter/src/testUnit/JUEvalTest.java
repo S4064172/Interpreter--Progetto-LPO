@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
@@ -12,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import _1_StreamScanner.ScannerException;
+import _2_StreamParser.ParserException;
 import _2_StreamParser.StreamParser;
 import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
@@ -26,7 +30,9 @@ import _3_Ast.Pair;
 import _3_Ast.Prog;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
+import _3_Ast.SwitchStmt;
 import _4_Visitors.evaluation.Eval;
+import _4_Visitors.evaluation.EvaluatorException;
 import _4_Visitors.typechecking.TypeCheck;
 import _4_Visitors.typechecking.TypecheckerException;
 
@@ -126,7 +132,7 @@ public class JUEvalTest {
 				else
 					fail(e.getCause().getMessage());
 			}
-
+			
 		}
 		catch (Exception e) {
 			fail(e.getMessage());
@@ -306,4 +312,124 @@ public class JUEvalTest {
 		} 
 		System.setOut(System.out);
 	}
+	
+	@ParameterizedTest
+	@CsvSource
+	({
+		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','5'",
+		"'switch(10){case 1{print 5 break}case 2{print 6 break}}',''",
+		"'switch(-10){case 1{print 5 break}case 2{print 7 break}case -10{print 6 break}}','6'",
+		"switch(1+5){case 5+1{print 5 break}case 2+5{print 5 break}},'5'"
+		
+	})
+	public void TestSwitchEvalRight(String input, String resultExpected)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
+		{
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				SwitchStmt resultInvoke =(SwitchStmt) method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				String resultString = resultCall.toString().replace("\r\n", " ");
+				if(resultString.length()!=0)
+					resultString = resultString.substring(0, resultString.length()-1);
+				assertThat(resultString, is(resultExpected));
+			}catch(Exception e)
+			{
+				e.printStackTrace();
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+	}
+	
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'switch(1+5){case 5+1{print 5 break}case 1+5{print 5 break}}'"
+	})
+	public void TestSwitchEvalWrong_ThrowsExeption(String input)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
+		{
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				method.setAccessible(true);
+				tokenizer.next();
+				SwitchStmt resultInvoke =(SwitchStmt) method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				fail("recognised ->"+input);
+			}catch(Exception e)
+			{
+				if( !e.getClass().equals(TypecheckerException.class) &&
+						!e.getClass().equals(EvaluatorException.class) &&
+						!e.getCause().getClass().equals(ParserException.class) &&
+						!e.getCause().getClass().equals(ScannerException.class) &&
+						!e.getCause().getClass().equals(IOException.class))
+								fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+	}
+	
+	@ParameterizedTest
+	@CsvSource
+	({ 
+		"'var i = 0;do{print i ; var qwe = 3 + i; print qwe; i=i+1}while(i<10)',"+
+				"'0 3 1 4 2 5 3 6 4 7 5 8 6 9 7 10 8 11 9 12'"
+	})
+	public void TestDoWhileEvalRight(String input, String resultExpected)
+	{		
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) ) 
+		{
+			ByteArrayOutputStream resultCall = new ByteArrayOutputStream();
+			System.setOut(new PrintStream(resultCall));
+			
+			try
+			{
+				StreamParser parser = new StreamParser(tokenizer);
+				Method method = parser.getClass().getDeclaredMethod("parseProg", null);
+				Prog resultInvoke =(Prog)  method.invoke(parser);
+				resultInvoke.accept(new TypeCheck());
+				resultInvoke.accept(new Eval());
+				String resultString = resultCall.toString().replace("\r\n", " ");
+				resultString = resultString.substring(0, resultString.length()-1);
+				assertThat(resultString, is(resultExpected));
+			}catch(Exception e)
+			{
+				if(e.getClass().equals(TypecheckerException.class))
+					fail(e.getMessage());
+				else
+					fail(e.getCause().getMessage());
+			}
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		System.setOut(System.out);
+	}
+
 }
