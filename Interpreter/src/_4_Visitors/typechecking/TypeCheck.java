@@ -2,9 +2,13 @@ package _4_Visitors.typechecking;
 
 import static _4_Visitors.typechecking.PrimtType.*;
 
+import java.util.HashMap;
+import java.util.List;
+import _3_Ast.CaseStmt;
 import _3_Ast.Exp;
 import _3_Ast.ExpSeq;
 import _3_Ast.Ident;
+import _3_Ast.IntLiteral;
 import _3_Ast.SimpleIdent;
 import _3_Ast.Stmt;
 import _3_Ast.StmtSeq;
@@ -175,6 +179,36 @@ public class TypeCheck implements Visitor<Type> {
 	}
 	
 	@Override
+	public Type visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block) {
+		exp.accept(this).checkEqual(INT);
+		for (Exp iterable_element : block.keySet()) {
+			if( block.get(iterable_element).size() > 1)
+				throw new TypecheckerException("Duplicate key Case");
+			block.get(iterable_element).get(0).accept(this);
+		}
+		return null;
+	}
+
+	@Override
+	public Type visitCaseStmt(Exp key, StmtSeq block) {
+		key.accept(this).checkEqual(INT);
+		env.enterScope();
+		block.accept(this);
+		env.exitScope();
+		return null;
+	}
+	
+
+	public Type visitDoWhileStmt(Exp exp, StmtSeq block) {
+		exp.accept(this).checkEqual(BOOL);
+		env.enterScope();
+		block.accept(this);
+		env.exitScope();
+		return null;
+	}
+
+	
+	@Override
 	public Type visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock) {
 		exp.accept(this).checkEqual(BOOL);
 		env.enterScope();
@@ -227,8 +261,7 @@ public class TypeCheck implements Visitor<Type> {
 	@Override
 	public Type visitSnd(Exp exp) {
 		return ((PairType) exp.accept(this).checkPair()).getElTypeSecond();
-	}
-	
+	}	
 /************/
 
 }

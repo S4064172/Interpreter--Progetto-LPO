@@ -1,9 +1,13 @@
 package _4_Visitors;
 
 
+import java.util.HashMap;
+import java.util.List;
+import _3_Ast.CaseStmt;
 import _3_Ast.Exp;
 import _3_Ast.ExpSeq;
 import _3_Ast.Ident;
+import _3_Ast.IntLiteral;
 import _3_Ast.Stmt;
 import _3_Ast.StmtSeq;
 
@@ -58,7 +62,13 @@ public interface Visitor<T> {
 /************/
 	T visitWhileStmt(Exp exp, StmtSeq block);
 	
+	T visitDoWhileStmt(Exp exp, StmtSeq block);
+	
 	T visitIfStmt(Exp exp, StmtSeq ifBlock, StmtSeq elseBlock);
+	
+	T visitSwitchStmt(Exp exp, HashMap<Exp, List<CaseStmt>> block);
+	
+	T visitCaseStmt(Exp key, StmtSeq block);
 	
 	T visitConCat(Exp left, Exp right);
 	

@@ -397,7 +397,7 @@ public class JUParsetTest {
 		} 
 		
 	}
-	
+
 	@ParameterizedTest
 	@ValueSource(strings = {
 			"if(){}",
@@ -406,6 +406,7 @@ public class JUParsetTest {
 	})
 	public void testIfWrong_ThrowExecption(String input)
 	{
+		
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			
@@ -433,5 +434,142 @@ public class JUParsetTest {
 		} 
 		
 	}
+	
+	
+	@ParameterizedTest()
+	@CsvSource({
+		"'switch(1){case 1{print 5 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1){case 1{print 5 break}case 2{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(IntLiteral(2),SingleStmt(PrintStmt(IntLiteral(6)))))'",
+		"'switch(1){case 1{print 5 break}case 1{print 6 break}}','SwitchStmt(IntLiteral(1),CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(6))))CaseStmt(IntLiteral(1),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1){case [5]{print 5 break}}','SwitchStmt(IntLiteral(1),CaseStmt(ListLiteral(SingleExp(IntLiteral(5))),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch([5]){case [5]{print 5 break}}','SwitchStmt(ListLiteral(SingleExp(IntLiteral(5))),CaseStmt(ListLiteral(SingleExp(IntLiteral(5))),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1+5){case 5+1{print 5 break}case 5+1{print 5 break}}','SwitchStmt(Add(IntLiteral(1),IntLiteral(5)),CaseStmt(Add(IntLiteral(5),IntLiteral(1)),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(Add(IntLiteral(5),IntLiteral(1)),SingleStmt(PrintStmt(IntLiteral(5)))))'",
+		"'switch(1+5){case 5+1{print 5 break}case 1+5{print 5 break}}','SwitchStmt(Add(IntLiteral(1),IntLiteral(5)),CaseStmt(Add(IntLiteral(1),IntLiteral(5)),SingleStmt(PrintStmt(IntLiteral(5))))CaseStmt(Add(IntLiteral(5),IntLiteral(1)),SingleStmt(PrintStmt(IntLiteral(5)))))'"
+	})
+	public void testSwitchRight(String input,String resultExpected)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				String resultInvoke= method.invoke(parser).toString();
+				assertThat(resultInvoke, is(resultExpected));
+			}catch (Exception e) {
+				e.printStackTrace();
+				fail(e.getCause().getMessage());
+			} 
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} 
+		
+		
+	}
 
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"switch(){}",
+			"switch(1){}",
+			"switch(1){case [5]{}}",
+			"switch(1){case 1 {print 5}}",
+			"switch(1){case 1 print 5}"
+	})
+	public void testSwitchWrong_ThrowExecption(String input)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser p = new StreamParser(tokenizer);
+			Method method = p.getClass().getDeclaredMethod("parseSwitchStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				method.invoke(p).toString();
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+			
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class) &&
+					!e.getCause().getClass().equals(IllegalStateException.class))
+							fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR " 
+							+ScannerException.class+" OR"
+							+ IOException.class+ " OR "+IllegalStateException.class);	
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+	
+	@ParameterizedTest()
+	@CsvSource({
+		"'do{print 5}while(true)','DoWhileStmt(BoolLiteral(true),SingleStmt(PrintStmt(IntLiteral(5))))'",
+		"'do{print [5]}while(5<10)','DoWhileStmt(Lth(IntLiteral(5),IntLiteral(10)),SingleStmt(PrintStmt(ListLiteral(SingleExp(IntLiteral(5))))))'"
+		})
+	public void testDoWhileRight(String input, String resultExpected)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				String result= method.invoke(parser).toString();
+				assertThat(result, is(resultExpected));
+			}catch (Exception e) {
+				fail(e.getCause().getMessage());
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"do{}",
+			"do{}while()",
+			"do{}while(true)"
+	})
+	public void testDoWhilefWrong_ThrowExecption(String input)
+	{
+		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
+		{
+			StreamParser parser = new StreamParser(tokenizer);
+			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+			method.setAccessible(true);
+			tokenizer.next();
+			try
+			{
+				method.invoke(parser).toString();
+				fail("recognised -->"+input);
+			}catch (Exception e) 
+			{
+			
+				if(	!e.getCause().getClass().equals(ParserException.class) &&
+					!e.getCause().getClass().equals(ScannerException.class) &&
+					!e.getCause().getClass().equals(IOException.class))
+							fail("found "+e.getCause().getClass()+" expeted "+ParserException.class+" OR" 
+							+ScannerException.class+"OR"
+							+ IOException.class);
+			} 
+		}
+		catch (Exception e) {
+			fail(e.getMessage());
+		} 
+		
+	}
+
+	
 }
