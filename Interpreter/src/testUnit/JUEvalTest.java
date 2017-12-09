@@ -231,7 +231,8 @@ public class JUEvalTest {
 	({ 
 		"'if (3<05) {	var x = 5;	print x}else{	print 15}','5'",
 		"'if (true) {	print 5}','5'",
-		"'if (5<07){	print  10}','10'"
+		"'if (5<07){	print  10}','10'",
+		"'if (5<1){	print  10}',''"
 	})
 	public void TestIfEvalRight(String input, String resultExpected)
 	{		
@@ -250,7 +251,8 @@ public class JUEvalTest {
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());
 				String resutlString =resultCall.toString();
-				resutlString = resutlString.substring(0, resutlString.length()-2);
+				if(resutlString.length()>0)
+					resutlString = resutlString.substring(0, resutlString.length()-2);
 				assertThat(resutlString, is(resultExpected));
 			}catch(Exception e)
 			{
@@ -270,7 +272,8 @@ public class JUEvalTest {
 	@CsvSource
 	({ 
 		"'var i = 0;while (i<10){print i ; var qwe = 3 + i; print qwe; i=i+1}',"+
-				"'0 3 1 4 2 5 3 6 4 7 5 8 6 9 7 10 8 11 9 12'"
+				"'0 3 1 4 2 5 3 6 4 7 5 8 6 9 7 10 8 11 9 12'",
+		"'var x =10;while (x<10){print x ; var qwe = 3 + x; print qwe; x=x+1}',''"
 	})
 	public void TestWhileEvalRight(String input, String resultExpected)
 	{		
@@ -287,7 +290,8 @@ public class JUEvalTest {
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());
 				String resultString = resultCall.toString().replace("\r\n", " ");
-				resultString = resultString.substring(0, resultString.length()-1);
+				if(resultString.length()>0)
+					resultString = resultString.substring(0, resultString.length()-1);
 				assertThat(resultString, is(resultExpected));
 			}catch(Exception e)
 			{
