@@ -5,24 +5,13 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Scanner;
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import _1_StreamScanner.ScannerException;
-import _2_StreamParser.ParserException;
 import _2_StreamParser.StreamParser;
 import _2_Tokenizer.StreamTokenizer;
 import _2_Tokenizer.Tokenizer;
@@ -31,15 +20,12 @@ import _3_Ast.ConCat;
 import _3_Ast.Div;
 import _3_Ast.Fst;
 import _3_Ast.IfStmt;
-import _3_Ast.IntLiteral;
 import _3_Ast.Length;
 import _3_Ast.Mul;
 import _3_Ast.Pair;
 import _3_Ast.Prog;
-import _3_Ast.ProgClass;
 import _3_Ast.Snd;
 import _3_Ast.Sub;
-import _3_Ast.WhileStmt;
 import _4_Visitors.evaluation.Eval;
 import _4_Visitors.typechecking.TypeCheck;
 import _4_Visitors.typechecking.TypecheckerException;
@@ -245,7 +231,8 @@ public class JUEvalTest {
 	({ 
 		"'if (3<05) {	var x = 5;	print x}else{	print 15}','5'",
 		"'if (true) {	print 5}','5'",
-		"'if (5<07){	print  10}','10'"
+		"'if (5<07){	print  10}','10'",
+		"'if (5<1){	print  10}',''"
 	})
 	public void TestIfEvalRight(String input, String resultExpected)
 	{		
@@ -264,7 +251,8 @@ public class JUEvalTest {
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());
 				String resutlString =resultCall.toString();
-				resutlString = resutlString.substring(0, resutlString.length()-2);
+				if(resutlString.length()>0)
+					resutlString = resutlString.substring(0, resutlString.length()-2);
 				assertThat(resutlString, is(resultExpected));
 			}catch(Exception e)
 			{
@@ -284,7 +272,8 @@ public class JUEvalTest {
 	@CsvSource
 	({ 
 		"'var i = 0;while (i<10){print i ; var qwe = 3 + i; print qwe; i=i+1}',"+
-				"'0 3 1 4 2 5 3 6 4 7 5 8 6 9 7 10 8 11 9 12'"
+				"'0 3 1 4 2 5 3 6 4 7 5 8 6 9 7 10 8 11 9 12'",
+		"'var x =10;while (x<10){print x ; var qwe = 3 + x; print qwe; x=x+1}',''"
 	})
 	public void TestWhileEvalRight(String input, String resultExpected)
 	{		
@@ -301,7 +290,8 @@ public class JUEvalTest {
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());
 				String resultString = resultCall.toString().replace("\r\n", " ");
-				resultString = resultString.substring(0, resultString.length()-1);
+				if(resultString.length()>0)
+					resultString = resultString.substring(0, resultString.length()-1);
 				assertThat(resultString, is(resultExpected));
 			}catch(Exception e)
 			{

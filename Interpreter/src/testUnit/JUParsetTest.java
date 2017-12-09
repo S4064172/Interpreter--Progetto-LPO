@@ -3,7 +3,6 @@ package testUnit;
 
 import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
