@@ -1,5 +1,0 @@
-package testUnit;
-
-class RunAllTests {
-
-}
