@@ -38,6 +38,7 @@ import _4_Visitors.typechecking.TypecheckerException;
 
 public class JUEvalTest {
 
+	private static final Class<?>[] NoParams=null;
 	@ParameterizedTest
 	@CsvSource
 	({ 
@@ -60,7 +61,7 @@ public class JUEvalTest {
 				try
 				{
 					StreamParser parser = new StreamParser(tokenizer);
-					Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
+					Method method = parser.getClass().getDeclaredMethod("parseAtom", NoParams);
 					method.setAccessible(true);
 					tokenizer.next();
 					Object resultInvoke =  method.invoke(parser);
@@ -118,7 +119,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+				Method method = parser.getClass().getDeclaredMethod("parseConCat", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				ConCat resultInvoke = (ConCat) method.invoke(parser);
@@ -155,7 +156,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+				Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				Object resultInvoke =  method.invoke(parser);
@@ -202,7 +203,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+				Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				Object resultInvoke =  method.invoke(parser);
@@ -250,7 +251,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				IfStmt resultInvoke =(IfStmt)  method.invoke(parser);
@@ -291,7 +292,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseProg", null);
+				Method method = parser.getClass().getDeclaredMethod("parseProg", NoParams);
 				Prog resultInvoke =(Prog)  method.invoke(parser);
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());
@@ -332,7 +333,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				SwitchStmt resultInvoke =(SwitchStmt) method.invoke(parser);
@@ -372,7 +373,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				SwitchStmt resultInvoke =(SwitchStmt) method.invoke(parser);
@@ -411,7 +412,7 @@ public class JUEvalTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseProg", null);
+				Method method = parser.getClass().getDeclaredMethod("parseProg", NoParams);
 				Prog resultInvoke =(Prog)  method.invoke(parser);
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());

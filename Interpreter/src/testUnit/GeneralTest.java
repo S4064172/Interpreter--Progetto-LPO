@@ -21,6 +21,8 @@ import _4_Visitors.typechecking.TypecheckerException;
 
 class GeneralTest {
 
+	private static final Class<?>[] NoParams = null;
+	
 	@ParameterizedTest
 	@CsvSource
 	({ 
@@ -115,7 +117,7 @@ class GeneralTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseProg", null);
+				Method method = parser.getClass().getDeclaredMethod("parseProg", NoParams);
 				Prog resultInvoke =(Prog)  method.invoke(parser);
 				resultInvoke.accept(new TypeCheck());
 				resultInvoke.accept(new Eval());

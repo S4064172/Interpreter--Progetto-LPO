@@ -19,6 +19,8 @@ import _2_Tokenizer.Tokenizer;
 
 public class JUParsetTest {
 
+	private static final Class<?>[] NoParams = null;
+	
 	@ParameterizedTest
 	@CsvSource
 	({ 
@@ -43,7 +45,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
+			Method method = parser.getClass().getDeclaredMethod("parseAtom", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -79,7 +81,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
+			Method method = parser.getClass().getDeclaredMethod("parseAtom", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -117,7 +119,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+			Method method = parser.getClass().getDeclaredMethod("parseConCat", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -147,7 +149,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+			Method method = parser.getClass().getDeclaredMethod("parseConCat", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -182,7 +184,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()))) ))
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+			Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -213,7 +215,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser parset = new StreamParser(tokenizer);
-			Method method = parset.getClass().getDeclaredMethod("parseAddOrSub", null);
+			Method method = parset.getClass().getDeclaredMethod("parseAddOrSub", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -249,7 +251,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+			Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -281,7 +283,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser p = new StreamParser(t);
-			Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+			Method method = p.getClass().getDeclaredMethod("parseTimesOrDiv", NoParams);
 			method.setAccessible(true);
 			t.next();
 			try
@@ -316,7 +318,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+			Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -344,7 +346,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+			Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -381,7 +383,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+			Method method = parser.getClass().getDeclaredMethod("parseIfStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -411,7 +413,7 @@ public class JUParsetTest {
 		{
 			
 			StreamParser p = new StreamParser(tokenizer);
-			Method method = p.getClass().getDeclaredMethod("parseIfStmt", null);
+			Method method = p.getClass().getDeclaredMethod("parseIfStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -451,7 +453,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+			Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -484,7 +486,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser p = new StreamParser(tokenizer);
-			Method method = p.getClass().getDeclaredMethod("parseSwitchStmt", null);
+			Method method = p.getClass().getDeclaredMethod("parseSwitchStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -519,7 +521,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -547,7 +549,7 @@ public class JUParsetTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+			Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
