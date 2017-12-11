@@ -35,6 +35,8 @@ import _4_Visitors.typechecking.TypecheckerException;
 
 public class JUTypeCheckTest {
 
+	private static final Class<?>[] NoParams = null;
+	
 	@ParameterizedTest
 	@CsvSource
 	({ 
@@ -58,7 +60,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
+				Method method = parser.getClass().getDeclaredMethod("parseAtom", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				Object resultInvoke =  method.invoke(parser);
@@ -106,7 +108,7 @@ public class JUTypeCheckTest {
 		{
 			
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseAtom", null);
+				Method method = parser.getClass().getDeclaredMethod("parseAtom", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				
@@ -156,7 +158,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+				Method method = parser.getClass().getDeclaredMethod("parseConCat", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				ConCat resultInvoke =  (ConCat)method.invoke(parser);
@@ -189,7 +191,7 @@ public class JUTypeCheckTest {
 		try(Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name())))) )
 		{
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseConCat", null);
+			Method method = parser.getClass().getDeclaredMethod("parseConCat", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -227,7 +229,7 @@ public class JUTypeCheckTest {
 			{
 				String resultCall;
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+				Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				Object resultInvoke =  method.invoke(parser);
@@ -269,7 +271,7 @@ public class JUTypeCheckTest {
 		{
 			
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", null);
+			Method method = parser.getClass().getDeclaredMethod("parseAddOrSub", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
 			try
@@ -309,7 +311,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+				Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				Object resultInvoke =  method.invoke(parser);
@@ -344,17 +346,16 @@ public class JUTypeCheckTest {
 		{
 			
 			StreamParser parser = new StreamParser(tokenizer);
-			Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", null);
+			Method method = parser.getClass().getDeclaredMethod("parseTimesOrDiv", NoParams);
 			method.setAccessible(true);
 			tokenizer.next();
-			String resultCall;
 			try
 			{
 				Object resultInvoke =  method.invoke(parser);
 				if(resultInvoke instanceof Div)
-					resultCall=((Div)resultInvoke).accept(new TypeCheck()).toString();
+					((Div)resultInvoke).accept(new TypeCheck());
 				else
-					resultCall=((Mul)resultInvoke).accept(new TypeCheck()).toString();
+					((Mul)resultInvoke).accept(new TypeCheck());
 				fail("recognised--> "+input);
 			}catch(Exception e )
 			{
@@ -384,7 +385,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				WhileStmt resultInvoke =  (WhileStmt)method.invoke(parser);
@@ -415,7 +416,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseWhileStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				WhileStmt resultInvoke =  (WhileStmt)method.invoke(parser);
@@ -447,7 +448,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				IfStmt resultInvoke =  (IfStmt)method.invoke(parser);
@@ -478,7 +479,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseIfStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				IfStmt resultInvoke =  (IfStmt)method.invoke(parser);
@@ -512,7 +513,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				SwitchStmt resultInvoke =  (SwitchStmt)method.invoke(parser);
@@ -544,7 +545,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseSwitchStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				SwitchStmt resultInvoke =  (SwitchStmt)method.invoke(parser);
@@ -577,7 +578,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				DoWhileStmt resultInvoke =  (DoWhileStmt)method.invoke(parser);
@@ -610,7 +611,7 @@ public class JUTypeCheckTest {
 			try
 			{
 				StreamParser parser = new StreamParser(tokenizer);
-				Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", null);
+				Method method = parser.getClass().getDeclaredMethod("parseDoWhileStmt", NoParams);
 				method.setAccessible(true);
 				tokenizer.next();
 				DoWhileStmt resultInvoke =  (DoWhileStmt)method.invoke(parser);
